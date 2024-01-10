@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StreamGameEngine</title>
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script>
+        const models = {};
+        function addModel(data) {
+          console.log(`addModel(${JSON.stringify(data)})`);
+          const newModel = BABYLON.MeshBuilder.CreateSphere(`Model_${data.id}`);
+          models[data.id] = newModel;
+          newModel.position = new BABYLON.Vector3(data.x, data.y, data.z);
+          newModel.material = new BABYLON.StandardMaterial(`Material_${data.id}`);
+          newModel.material.diffuseColor = BABYLON.Color3.FromHexString(data.color);
+
+          if (data.clickable) {
+            newModel.actionManager = new BABYLON.ActionManager();
+            newModel.actionManager.registerAction(
+              new BABYLON.ExecuteCodeAction(
+                BABYLON.ActionManager.OnPickTrigger,
+                function() { fetch(`/clickModel/${data.id}`); }
+            ));
+          }
+        }
+
+        function moveModel(data) {
+          const model = models[data.id];
+          const fps = 30;
+          const frames = fps * data.duration;
+          BABYLON.Animation.CreateAndStartAnimation(`Move_Model_${data.id}`, model, 'position', fps, frames, model.position, new BABYLON.Vector3(data.x, data.y, data.z), BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+        }
+
+        function removeModel(data) {
+          models[data.id].dispose();
+          delete models[data.id];
+        }
+
+        window.addEventListener('load', function() {
+          const canvas = document.getElementById("renderCanvas");
+          const engine = new BABYLON.Engine(canvas, true);
+          const scene = new BABYLON.Scene(engine);
+
+          const cameraTarget = new BABYLON.Vector3(3.5, 0, -3.5);
+          const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, cameraTarget);
+          camera.attachControl(canvas, true);
+          const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+
+          engine.runRenderLoop(function () {
+              scene.render();
+          });
+
+          // Watch for browser/canvas resize events
+          window.addEventListener("resize", function () {
+              engine.resize();
+          });
+
+          const eventSource = new EventSource("event-stream");
+          eventSource.addEventListener("addModel",    (event) => { addModel   (JSON.parse(event.data)); });
+          eventSource.addEventListener("moveModel",   (event) => { moveModel  (JSON.parse(event.data)); });
+          eventSource.addEventListener("removeModel", (event) => { removeModel(JSON.parse(event.data)); });
+        });
+    </script>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+</body>
+</html>
