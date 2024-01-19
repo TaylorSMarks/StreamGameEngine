@@ -1,14 +1,20 @@
 package com.marksfam
 
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 val idGenerator = AtomicLong()
 val models = HashMap<Long, Model>()
 
-data class Position(val x: Int, val y: Int, val z: Int = 0)
+data class Position(val x: Int, val y: Int, val z: Int = 0) {
+    fun distanceTo(o: Position) =
+            sqrt((x - o.x).toFloat().pow(2) + (y - o.y).toFloat().pow(2) + (z - o.z).toFloat().pow(2))
+}
 
 class Model(position: Position, val color: String, val onClick: ((Model) -> Unit)? = null) {
     private val id = idGenerator.incrementAndGet()
+    private var emittedViaMoveAlready = false
 
     init {
         models[id] = this
@@ -24,13 +30,29 @@ class Model(position: Position, val color: String, val onClick: ((Model) -> Unit
     var position = position
         set(newPosition) {
             field = newPosition
-            controller.emitEvent("moveModel",
-                "id" to id,
-                "x" to field.x,
-                "y" to field.y,
-                "z" to field.z,
-                "duration" to 0.5)
+            if (emittedViaMoveAlready) {
+                emittedViaMoveAlready = false
+            } else {
+                controller.emitEvent("moveModel",
+                        "id" to id,
+                        "x" to field.x,
+                        "y" to field.y,
+                        "z" to field.z,
+                        "duration" to 0.5)
+            }
         }
+
+    fun move(newPosition: Position, speed: Float) {
+        val duration = position.distanceTo(newPosition) / speed
+        controller.emitEvent("moveModel",
+                "id" to id,
+                "x" to newPosition.x,
+                "y" to newPosition.y,
+                "z" to newPosition.z,
+                "duration" to duration)
+        emittedViaMoveAlready = true
+        position = newPosition
+    }
 
     fun destroy() {
         controller.emitEvent("removeModel", "id" to id)

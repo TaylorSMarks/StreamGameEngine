@@ -8,6 +8,7 @@ val colors = listOf("#ff0000", "#ff8800", "#ccff00", "#00ff00", "#4444ff", "#bb0
 
 @RestController
 class Match3: Controller() {
+    private val dropSpeed = 10.0f
     val grid = Grid<Model?>(7, 7, null)
 
     var priorClick: Model? = null
@@ -103,7 +104,7 @@ class Match3: Controller() {
 
                 if (dropTo != -1) {
                     grid[x, y]?.let {
-                        it.position = Position(x, dropTo)
+                        it.move(Position(x, dropTo), dropSpeed)
                         grid[x, dropTo] = it
                         grid[x, y] = null
                         dropTo++
@@ -115,14 +116,14 @@ class Match3: Controller() {
                 for (y in dropTo..<grid.height) {
                     val newTile = Model(Position(x, y + 10), colors.random(), ::onClick)
                     grid[x, y] = newTile
-                    newTile.position = Position(x, y)
+                    newTile.move(Position(x, y), dropSpeed)
                     tilesDropping = true
                 }
             }
         }
 
         if (tilesDropping) {
-            sleep(500)
+            sleep(800)
             if (detectAndRemoveMatches() == 0) {
                 // If matches were found, we'd recurse into dropTiles anyways,
                 // so we only need to check if moves remain if matches were not found.
