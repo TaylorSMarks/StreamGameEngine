@@ -38,6 +38,11 @@ abstract class Controller {
         models[id]?.let { it.onClick?.invoke(it) }
     }
 
+    @GetMapping("/mesh/{name}")
+    fun getMesh(@PathVariable name: String): Map<String, List<Number>> {
+        return Mesh.named[name]!!.json()
+    }
+
     abstract fun onJoin()
 
     fun emitEvent(type: String, data: String) {
