@@ -10,7 +10,7 @@
 9. Meshes, not just sphere
     * Heart (Red)
     * Star (Yellow)
-    * Cresent Moon (Purple)
+    * Crescent Moon (Purple)
     * Lightning Bolt (Orange)
     * Snowflake (White)
     * Rupee (Green)
