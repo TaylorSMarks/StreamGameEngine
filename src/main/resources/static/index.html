@@ -22,10 +22,31 @@
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script>
         const models = {};
-        function addModel(data) {
+        const meshes = {};
+
+        async function addModel(data) {
           console.log(`addModel(${JSON.stringify(data)})`);
-          const newModel = BABYLON.MeshBuilder.CreateSphere(`Model_${data.id}`);
+          const name = `Model_${data.id}`;
+          var newModel;
+          if (data.mesh === "sphere") {
+              newModel = BABYLON.MeshBuilder.CreateSphere(name);
+          } else {
+              newModel = new BABYLON.Mesh(name);
+              if (!meshes.hasOwnProperty(data.mesh)) {
+                  const response = await fetch(`/mesh/${data.mesh}`);
+                  const meshData = await response.json();
+                  const normals = [];
+                  BABYLON.VertexData.ComputeNormals(meshData.positions, meshData.indices, normals);
+                  const vertexData = new BABYLON.VertexData();
+                  vertexData.positions = meshData.positions;
+                  vertexData.indices = meshData.indices;
+                  vertexData.normals = normals;
+                  meshes[data.mesh] = vertexData;
+              }
+              meshes[data.mesh].applyToMesh(newModel);
+          }
           models[data.id] = newModel;
+          console.log(`model created with id ${data.id}`);
           newModel.position = new BABYLON.Vector3(data.x, data.y, data.z);
           newModel.material = new BABYLON.StandardMaterial(`Material_${data.id}`);
           newModel.material.diffuseColor = BABYLON.Color3.FromHexString(data.color);
@@ -41,6 +62,7 @@
         }
 
         function moveModel(data) {
+          console.log(`Attempting to move model with id ${data.id}`);
           const model = models[data.id];
           const fps = 30;
           const frames = fps * data.duration;

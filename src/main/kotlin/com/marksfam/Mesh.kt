@@ -22,8 +22,24 @@ data class Mesh(val vertexes: List<Vertex>, val indices: List<Int>) {
 
 val bolt = Mesh(
         listOf(
-                // TODO: Define the other 13 vertexes...
-                Vertex(-0.2, 1.0, 0.2)),
+                // Top cap:
+                Vertex(-0.2,  1.0,  0.2),
+                Vertex( 0.2,  1.0,  0.2),
+                Vertex( 0.2,  1.0, -0.2),
+                Vertex(-0.2,  1.0, -0.2),
+                // Right side:
+                Vertex( 0.0, -0.3,  0.2),
+                Vertex( 0.0, -0.3, -0.2),
+                Vertex( 0.2,  0.3,  0.2),
+                Vertex( 0.2,  0.3, -0.2),
+                // Bottom point:
+                Vertex( 0.0, -1.0,  0.2),
+                Vertex( 0.0, -1.0, -0.2),
+                // Left side:
+                Vertex( 0.0,  0.3,  0.2),
+                Vertex( 0.0,  0.3, -0.2),
+                Vertex(-0.3, -0.3,  0.2),
+                Vertex(-0.3, -0.3, -0.2)),
         rects(0, 1, 2, 3, // Top cap
                 // Right side:
                 1, 4, 5, 2,
@@ -43,38 +59,3 @@ val bolt = Mesh(
                 6, 10, 8, // Front triangle
                 7, 11, 9) // Back triangle
         )
-
-// TODO: Planned meshes here...
-// 1. Heart
-// 2. Star
-// 3. Crescent Moon
-// 4. Lightning Bolt
-// 5. Snowflake
-// 6. Rupee
-// 7. Raindrop
-
-/*
-
-Babylon's doc examples...
-
-var customMesh = new BABYLON.Mesh("custom", scene);
-
-var positions = [-5, 2, -3, -7, -2, -3, -3, -2, -3, 5, 2, 3, 7, -2, 3, 3, -2, 3];
-var indices = [0, 1, 2, 3, 4, 5];
-
-//Empty array to contain calculated values or normals added
-var normals = [];
-
-//Calculations of normals added
-BABYLON.VertexData.ComputeNormals(positions, indices, normals);
-
-var vertexData = new BABYLON.VertexData();
-
-vertexData.positions = positions;
-vertexData.indices = indices;
-vertexData.normals = normals; //Assignment of normal to vertexData added
-
-vertexData.applyToMesh(customMesh);
-
-
- */

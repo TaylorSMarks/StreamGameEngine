@@ -12,7 +12,7 @@ data class Position(val x: Int, val y: Int, val z: Int = 0) {
             sqrt((x - o.x).toFloat().pow(2) + (y - o.y).toFloat().pow(2) + (z - o.z).toFloat().pow(2))
 }
 
-class Model(position: Position, val color: String, val onClick: ((Model) -> Unit)? = null) {
+class Model(position: Position, val color: String, val mesh: String, val onClick: ((Model) -> Unit)? = null) {
     private val id = idGenerator.incrementAndGet()
     private var emittedViaMoveAlready = false
 
@@ -24,6 +24,7 @@ class Model(position: Position, val color: String, val onClick: ((Model) -> Unit
             "z" to position.z,
             "color" to color,
             "id" to id,
+            "mesh" to mesh,
             "clickable" to (onClick != null))
     }
 

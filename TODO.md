@@ -1,6 +1,6 @@
-1. Finish making the Bolt mesh (13 vertexes left to define... should go quickish...)
-2. Pair the Bolt Mesh with the Orange color in Match3. Sent it from the Kotlin side to the JS side.
-3. On the JS side, query for the mesh, generate the mesh, and show it.
+1. Fix Bolt model.
+2. Fix issue of trying to move models before they're loaded/created...
+3. Ensure that each given model is only loaded once.
 4. Having both a position setter and a move method appear to be coexisting... poorly. Either fix it or undo it.
     * Theory - two different animations are trying to run on a single object. If the wrong animation "wins" it ends up in the wrong spot.
 5. Implement addText, changeText, addCountdown, and changeCountdown in the javascript side.

@@ -4,7 +4,14 @@ import org.springframework.web.bind.annotation.RestController
 import java.lang.Thread.sleep
 import kotlin.math.abs
 
-val colors = listOf("#ff0000", "#ff8800", "#ccff00", "#00ff00", "#4444ff", "#bb00bb", "#ffffff")
+val colorMeshPairs = listOf(
+        Pair("#ff0000", "sphere"),  // TODO: Heart
+        Pair("#ff8800", "bolt"),
+        Pair("#ccff00", "sphere"),  // TODO: Star
+        Pair("#00ff00", "sphere"),  // TODO: Rupee
+        Pair("#4444ff", "sphere"),  // TODO: Raindrop
+        Pair("#bb00bb", "sphere"),  // TODO: Crescent
+        Pair("#ffffff", "sphere"))  // TODO: Snowflake
 
 @RestController
 class Match3: Controller() {
@@ -114,7 +121,8 @@ class Match3: Controller() {
 
             if (dropTo != -1) {
                 for (y in dropTo..<grid.height) {
-                    val newTile = Model(Position(x, y + 10), colors.random(), ::onClick)
+                    val colorMeshPair = colorMeshPairs.random()
+                    val newTile = Model(Position(x, y + 10), colorMeshPair.first, colorMeshPair.second, ::onClick)
                     grid[x, y] = newTile
                     newTile.move(Position(x, y), dropSpeed)
                     tilesDropping = true
