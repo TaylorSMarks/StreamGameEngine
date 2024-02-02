@@ -34,12 +34,13 @@ abstract class Controller {
 
     @GetMapping("/clickModel/{id}")
     fun clickModel(@PathVariable id: Long) {
-        println("Received something at clickModel... $id")
+        println("GET clickModel/$id")
         models[id]?.let { it.onClick?.invoke(it) }
     }
 
     @GetMapping("/mesh/{name}")
     fun getMesh(@PathVariable name: String): Map<String, List<Number>> {
+        println("GET mesh/$name")
         return Mesh.named[name]!!.json()
     }
 

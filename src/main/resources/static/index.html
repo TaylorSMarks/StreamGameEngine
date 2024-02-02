@@ -20,31 +20,14 @@
     </style>
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="LoadableMesh.js"></script>
     <script>
         const models = {};
-        const meshes = {};
 
         async function addModel(data) {
           console.log(`addModel(${JSON.stringify(data)})`);
           const name = `Model_${data.id}`;
-          var newModel;
-          if (data.mesh === "sphere") {
-              newModel = BABYLON.MeshBuilder.CreateSphere(name);
-          } else {
-              newModel = new BABYLON.Mesh(name);
-              if (!meshes.hasOwnProperty(data.mesh)) {
-                  const response = await fetch(`/mesh/${data.mesh}`);
-                  const meshData = await response.json();
-                  const normals = [];
-                  BABYLON.VertexData.ComputeNormals(meshData.positions, meshData.indices, normals);
-                  const vertexData = new BABYLON.VertexData();
-                  vertexData.positions = meshData.positions;
-                  vertexData.indices = meshData.indices;
-                  vertexData.normals = normals;
-                  meshes[data.mesh] = vertexData;
-              }
-              meshes[data.mesh].applyToMesh(newModel);
-          }
+          const newModel = (data.mesh === "sphere") ? BABYLON.MeshBuilder.CreateSphere(name) : new LoadableMesh(name, data.mesh);
           models[data.id] = newModel;
           console.log(`model created with id ${data.id}`);
           newModel.position = new BABYLON.Vector3(data.x, data.y, data.z);
