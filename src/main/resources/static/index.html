@@ -62,10 +62,13 @@
           const engine = new BABYLON.Engine(canvas, true);
           const scene = new BABYLON.Scene(engine);
 
-          const cameraTarget = new BABYLON.Vector3(3.5, 0, -3.5);
-          const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, cameraTarget);
-          camera.attachControl(canvas, true);
-          const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+          const cameraTarget = new BABYLON.Vector3(3, 3, 0);
+          const cameraDistance = 10;  // Maybe too close for phones in landscape? Used to be 15...
+          new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, cameraDistance, cameraTarget);
+          // If you wanted it to be rotatable...
+          //camera.attachControl(canvas, true);
+
+            new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
 
           engine.runRenderLoop(function () {
               scene.render();

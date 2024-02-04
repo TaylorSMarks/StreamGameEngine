@@ -22,6 +22,16 @@ fun cap(center: Int, l: List<Int>): List<Int> {
     }
 }
 
+fun dogEar(l: List<Int>): List<Int> {
+    TODO("Take the first two + last, then the last two + second, the second and third + second from last, and so on...")
+}
+
+fun extrude(base: List<Vertex>, offsetsAndScales: List<Pair<Float, Float>>): Mesh {
+    TODO("Write this.")
+    // TODO: Also include running dogEar on the top and bottom to complete making the Mesh.
+    // TODO: Once this is done, rewrite bolt using it, and also write... all the remaining shapes with it.
+}
+
 data class Mesh(val vertexes: List<Vertex>, val indices: List<Int>) {
     companion object {
         val named = mutableMapOf(
