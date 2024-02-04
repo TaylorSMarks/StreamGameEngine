@@ -1,6 +1,4 @@
-package com.marksfam
-
-import kotlin.reflect.typeOf
+package com.marksfam.engine
 
 class Grid<T>(val width: Int, val height: Int, val initial: T) {
     private val grid = ArrayList<T>(width * height)
