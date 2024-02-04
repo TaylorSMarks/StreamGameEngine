@@ -7,7 +7,7 @@ import kotlin.math.abs
 val colorMeshPairs = listOf(
         Pair("#ff0000", "sphere"),  // TODO: Heart
         Pair("#ff8800", "bolt"),
-        Pair("#ccff00", "sphere"),  // TODO: Star
+        Pair("#ffff00", "star"),
         Pair("#00ff00", "sphere"),  // TODO: Rupee
         Pair("#4444ff", "sphere"),  // TODO: Raindrop
         Pair("#bb00bb", "sphere"),  // TODO: Crescent
