@@ -1,19 +1,21 @@
-1. Fix Bolt model.
-2. Implement addText, changeText, addCountdown, and changeCountdown in the javascript side.
-3. Track score, lives, and time on the Kotlin side.
-4. When the countdown ends, decrement lives.
-5. Buttons to join and start games...?
-6. Meshes, not just spheres
+1. Link the emitter to the Player + clicks to Players.
+   (The event stream should send a random UUID right when they join, which all subsequent actions must include to identify the player.)
+2. Increment both the score of the Player and the Room when matches are made.
+3. Change turns when a match is made. Discard clicks from players whose turn it isn't.
+4. When the countdown ends, decrement lives for both the Player and the Room (the game continues when the Room Lives hit zero, but the Room Score is final at that point...)
+5. Button to start the game.
+6. End the game when all players lose all their lives (or once a winner is determined?) 
+7. Fix Bolt model.
+8. Implement addText, changeText, addCountdown, and changeCountdown in the javascript side.
+9. Meshes, not just spheres
     * Heart (Red)
     * Crescent Moon (Purple)
     * Snowflake (White)
     * Rupee (Green)
     * Raindrop (Blue)
-7. Notions of players and picking random players.
-8. Fill in the far left and right edges of an iPhone in landscape.
-9. Permit multiple players to join the same game.
-10. Also fix the damn issue where it keeps crashing based on the SSE Event streams being resized or whatever.
-11. Having both a position setter and a move method appear to be coexisting... poorly. Either fix it or undo it.
+10. Fill in the far left and right edges of an iPhone in landscape.
+11. Also fix the damn issue where it keeps crashing based on the SSE Event streams being resized or whatever.
+12. Having both a position setter and a move method appear to be coexisting... poorly. Either fix it or undo it.
     * Theory - two different animations are trying to run on a single object. If the wrong animation "wins" it ends up in the wrong spot.
     * Oddly, making addModel be async reduces the frequency of the issue in Edge? I guess I'll just leave it that way for now, even though there's no other reason to have it be async...
-12. Include a hash for meshes. Cache meshes in local storage on the javascript side.
+13. Include a hash for meshes. Cache meshes in local storage on the javascript side.

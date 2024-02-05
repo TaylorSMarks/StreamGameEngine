@@ -1,9 +1,6 @@
 package com.marksfam
 
-import com.marksfam.engine.Controller
-import com.marksfam.engine.Grid
-import com.marksfam.engine.Model
-import com.marksfam.engine.Position
+import com.marksfam.engine.*
 import org.springframework.web.bind.annotation.RestController
 import java.lang.Thread.sleep
 import kotlin.math.abs
@@ -16,6 +13,8 @@ val colorMeshPairs = listOf(
         Pair("#4444ff", "sphere"),  // TODO: Raindrop
         Pair("#bb00bb", "sphere"),  // TODO: Crescent
         Pair("#ffffff", "sphere"))  // TODO: Snowflake
+
+val defaultRoom = Room()
 
 @RestController
 class Match3: Controller() {
@@ -194,6 +193,8 @@ class Match3: Controller() {
     }
 
     override fun onJoin() {
+        val player = Player(5)
+        defaultRoom.players.add(player)
         dropTiles()
     }
 }
