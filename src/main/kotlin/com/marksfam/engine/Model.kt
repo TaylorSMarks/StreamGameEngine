@@ -1,6 +1,8 @@
 package com.marksfam.engine
 
+import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.collections.HashMap
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -12,7 +14,7 @@ data class Position(val x: Int, val y: Int, val z: Int = 0) {
             sqrt((x - o.x).toFloat().pow(2) + (y - o.y).toFloat().pow(2) + (z - o.z).toFloat().pow(2))
 }
 
-class Model(position: Position, val color: String, val mesh: String, val onClick: ((Model) -> Unit)? = null) {
+class Model(position: Position, val color: String, val mesh: String, val onClick: ((UUID, Model) -> Unit)? = null) {
     private val id = idGenerator.incrementAndGet()
     private var emittedViaMoveAlready = false
 

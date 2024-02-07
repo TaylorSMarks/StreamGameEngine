@@ -14,6 +14,7 @@ lateinit var controller: Controller
 abstract class Controller {
     private val emitters = ArrayList<SseEmitter>()
     private val mapper = ObjectMapper()
+    val defaultRoom = Room()
 
     init {
         controller = this
@@ -27,15 +28,17 @@ abstract class Controller {
         emitter.onError { emitters.remove(emitter) }
         emitter.onTimeout { emitters.remove(emitter) }
 
-        onJoin()
+        val player = Player(emitter)
+        defaultRoom.addPlayer(player)
+        onJoin(player)
 
         return emitter
     }
 
-    @GetMapping("/clickModel/{id}")
-    fun clickModel(@PathVariable id: Long) {
-        println("GET clickModel/$id")
-        models[id]?.let { it.onClick?.invoke(it) }
+    @GetMapping("/clickModel/{playerId}/{modelId}")
+    fun clickModel(@PathVariable playerId: UUID, @PathVariable modelId: Long) {
+        println("GET clickModel/$playerId/$modelId")
+        models[modelId]?.let { it.onClick?.invoke(playerId, it) }
     }
 
     @GetMapping("/mesh/{name}")
@@ -44,7 +47,7 @@ abstract class Controller {
         return Mesh.named[name]!!.json()
     }
 
-    abstract fun onJoin()
+    abstract fun onJoin(player: Player)
 
     fun emitEvent(type: String, data: String) {
         // TODO: This still fails with a lot of ConcurrentModificationException... definitely need to change

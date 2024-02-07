@@ -3,6 +3,8 @@ package com.marksfam
 import com.marksfam.engine.*
 import org.springframework.web.bind.annotation.RestController
 import java.lang.Thread.sleep
+import java.util.*
+import kotlin.collections.HashSet
 import kotlin.math.abs
 
 val colorMeshPairs = listOf(
@@ -14,8 +16,6 @@ val colorMeshPairs = listOf(
         Pair("#bb00bb", "sphere"),  // TODO: Crescent
         Pair("#ffffff", "sphere"))  // TODO: Snowflake
 
-val defaultRoom = Room()
-
 @RestController
 class Match3: Controller() {
     private val dropSpeed = 10.0f
@@ -23,7 +23,12 @@ class Match3: Controller() {
 
     var priorClick: Model? = null
 
-    fun onClick(it: Model) {
+    fun onClick(playerId: UUID, it: Model) {
+        if (playerId != defaultRoom.currentPlayer?.id) {
+            println("Discard click from non-current player.")
+            return
+        }
+
         if (priorClick == null) {
             priorClick = it
             return
@@ -192,9 +197,17 @@ class Match3: Controller() {
         }
     }
 
-    override fun onJoin() {
-        val player = Player(5)
-        defaultRoom.players.add(player)
+    fun startGame() {
+        defaultRoom.allPlayers().forEach { it.lives = 5; it.score = 0 }
+        defaultRoom.lives = 20
+        defaultRoom.score = 0
+        defaultRoom.nextRandomPlayer()
         dropTiles()
+    }
+
+    override fun onJoin(player: Player) {
+        // TODO: Send them a button allowing them to start the game.
+        // TODO: Send to other players a message that a new player has joined the room.
+        startGame()
     }
 }

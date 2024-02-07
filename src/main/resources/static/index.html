@@ -23,6 +23,12 @@
     <script src="LoadableMesh.js"></script>
     <script>
         const models = {};
+        var playerId = "deadbeef-dead-4000-beef-cafebabedead";
+
+        function welcome(data) {
+            console.log(`welcome(${JSON.stringify(data)})`);
+            playerId = data.playerId;
+        }
 
         async function addModel(data) {
           console.log(`addModel(${JSON.stringify(data)})`);
@@ -39,7 +45,7 @@
             newModel.actionManager.registerAction(
               new BABYLON.ExecuteCodeAction(
                 BABYLON.ActionManager.OnPickTrigger,
-                function() { fetch(`/clickModel/${data.id}`); }
+                function() { fetch(`/clickModel/${playerId}/${data.id}`); }
             ));
           }
         }
@@ -83,6 +89,7 @@
           eventSource.addEventListener("addModel",    (event) => { addModel   (JSON.parse(event.data)); });
           eventSource.addEventListener("moveModel",   (event) => { moveModel  (JSON.parse(event.data)); });
           eventSource.addEventListener("removeModel", (event) => { removeModel(JSON.parse(event.data)); });
+          eventSource.addEventListener("welcome",     (event) => { welcome    (JSON.parse(event.data)); });
         });
     </script>
 </head>
