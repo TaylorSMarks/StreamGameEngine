@@ -60,38 +60,34 @@ class Match3: Controller() {
 
     fun detectAndRemoveMatches(): Int {
         val toRemove = HashSet<Model>()
-        for (x in 0..grid.width - 3) {
-            for (y in 0..<grid.height) {
-                var xMatch = 1
-                for (x2 in x + 1..<grid.width) {
-                    if (grid[x, y]?.color == grid[x2, y]?.color) {
-                        xMatch++
-                        if (xMatch >= 3) {
-                            toRemove.add(grid[x2, y]!!)
-                            toRemove.add(grid[x2 - 1, y]!!)
-                            toRemove.add(grid[x2 - 2, y]!!)
-                        }
-                    } else {
-                        break
+        grid.forEach(0..-3, 0..-1) { x, y, tile ->
+            var xMatch = 1
+            for (x2 in x + 1..<grid.width) {
+                if (tile?.color == grid[x2, y]?.color) {
+                    xMatch++
+                    if (xMatch >= 3) {
+                        toRemove.add(grid[x2, y]!!)
+                        toRemove.add(grid[x2 - 1, y]!!)
+                        toRemove.add(grid[x2 - 2, y]!!)
                     }
+                } else {
+                    break
                 }
             }
         }
 
-        for (x in 0..<grid.width) {
-            for (y in 0..grid.height - 3) {
-                var yMatch = 1
-                for (y2 in y + 1..<grid.height) {
-                    if (grid[x, y]?.color == grid[x, y2]?.color) {
-                        yMatch++
-                        if (yMatch >= 3) {
-                            toRemove.add(grid[x, y2]!!)
-                            toRemove.add(grid[x, y2 - 1]!!)
-                            toRemove.add(grid[x, y2 - 2]!!)
-                        }
-                    } else {
-                        break
+        grid.forEach(0..-1, 0..-3) { x, y, tile ->
+            var yMatch = 1
+            for (y2 in y + 1..<grid.height) {
+                if (tile?.color == grid[x, y2]?.color) {
+                    yMatch++
+                    if (yMatch >= 3) {
+                        toRemove.add(grid[x, y2]!!)
+                        toRemove.add(grid[x, y2 - 1]!!)
+                        toRemove.add(grid[x, y2 - 2]!!)
                     }
+                } else {
+                    break
                 }
             }
         }
@@ -154,31 +150,23 @@ class Match3: Controller() {
     }
 
     fun clear() {
-        for (x in 0..<grid.width) {
-            for (y in 0..<grid.height) {
-                grid[x, y]?.destroy()
-                grid[x, y] = null
-            }
+        grid.forEach { x, y, tile ->
+            tile?.destroy()
+            grid[x, y] = null
         }
     }
 
     fun doAnyMovesRemain(): Boolean {
-        for (x in 0..<grid.width) {
-            for (y in 0..<grid.height) {
-                if (   matchCheckHelper(x, y, 2,  0, 3,  0)    // X XX
-                    || matchCheckHelper(x, y, 1,  0, 3,  0)    // XX X
-                    || matchCheckHelper(x, y, 1,  0, 2,  1)    //   X   X
-                    || matchCheckHelper(x, y, 1,  1, 2,  0)    // XX   X X
-                    || matchCheckHelper(x, y, 1,  1, 2,  1)    //  XX  XX
-                    || matchCheckHelper(x, y, 1,  0, 2, -1)    // X      X
-                    || matchCheckHelper(x, y, 1, -1, 2,  0)    // X X  X
-                    || matchCheckHelper(x, y, 1, -1, 2, -1)) { //  X    XX
-                    println("Remaining move involving $x, $y")
-                    return true
-                }
-            }
+        return grid.any { x, y ->
+                       matchCheckHelper(x, y, 2,  0, 3,  0) // 1. X XX
+                    || matchCheckHelper(x, y, 1,  0, 3,  0) // 2. XX X
+                    || matchCheckHelper(x, y, 1,  0, 2,  1) // 3.   X | 4.  X
+                    || matchCheckHelper(x, y, 1,  1, 2,  0) //    XX  |    X X
+                    || matchCheckHelper(x, y, 1,  1, 2,  1) // 5.  XX | 6. XX
+                    || matchCheckHelper(x, y, 1,  0, 2, -1) //    X   |      X
+                    || matchCheckHelper(x, y, 1, -1, 2,  0) // 7. X X | 8. X
+                    || matchCheckHelper(x, y, 1, -1, 2, -1) //     X  |     XX
         }
-        return false
     }
 
     fun matchCheckHelper(x: Int, y: Int, xOffset1: Int, yOffset1: Int, xOffset2: Int, yOffset2: Int): Boolean {
