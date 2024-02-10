@@ -37,6 +37,7 @@ class Match3: Controller() {
         priorClick?.let { pc ->
             if (abs(pc.position.x - it.position.x) + abs(pc.position.y - it.position.y) == 1) {
                 // They're adjacent. So swap them!
+                // TODO: Pause the countdown during the animation.
                 val pcPosition = pc.position
                 pc.position = it.position
                 it.position = pcPosition
@@ -46,6 +47,8 @@ class Match3: Controller() {
                 sleep(500)
                 if (detectAndRemoveMatches() == 0) {
                     // The swap wasn't valid, so undo it.
+                    // TODO: Once the undo animation is done, apply a penalty to the countdown and resume it.
+                    // TODO: Check if the countdown reached zero from the penalty - deduct a life and pick a new player.
                     it.position = pc.position
                     pc.position = pcPosition
                     grid[it.position.x, it.position.y] = it
@@ -99,6 +102,8 @@ class Match3: Controller() {
 
         if (toRemove.isNotEmpty()) {
             dropTiles()
+            // TODO: Give points to the current player.
+            // TODO: Change whose turn it is.
         }
         return toRemove.size
     }
@@ -140,12 +145,13 @@ class Match3: Controller() {
                 // If matches were found, we'd recurse into dropTiles anyways,
                 // so we only need to check if moves remain if matches were not found.
                 if (!doAnyMovesRemain()) {
+                    // CONSIDER: Grant a bonus for clearing the board?
                     println("No moves remain, so resetting board.")
                     clear()
                     dropTiles()
                 }
             }
-            detectAndRemoveMatches()
+            detectAndRemoveMatches()  // TODO: Pretty sure this line is 100% pointless?
         }
     }
 
