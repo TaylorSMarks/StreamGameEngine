@@ -10,7 +10,13 @@ val mapper = ObjectMapper()
 
 class Player(val emitter: SseEmitter) {
     val id: UUID = UUID.randomUUID()
+
     var score: Int = 0
+        set(newScore) {
+            field = newScore
+            println("Score: $newScore")
+        }
+
     var lives: Int = 0
 
     private fun emitEvent(event: Set<ResponseBodyEmitter.DataWithMediaType>) {

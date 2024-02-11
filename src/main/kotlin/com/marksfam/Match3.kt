@@ -101,9 +101,14 @@ class Match3: Controller() {
         }
 
         if (toRemove.isNotEmpty()) {
+            defaultRoom.currentPlayer?.let {
+                val award = (toRemove.size - 1) * 5  // 10 for 3, 15 for 4, 20 for 5, etc...
+                it.score += award
+                if (defaultRoom.lives > 0) {
+                    defaultRoom.score += award
+                }
+            }
             dropTiles()
-            // TODO: Give points to the current player.
-            // TODO: Change whose turn it is.
         }
         return toRemove.size
     }
@@ -145,13 +150,17 @@ class Match3: Controller() {
                 // If matches were found, we'd recurse into dropTiles anyways,
                 // so we only need to check if moves remain if matches were not found.
                 if (!doAnyMovesRemain()) {
-                    // CONSIDER: Grant a bonus for clearing the board?
                     println("No moves remain, so resetting board.")
+                    // Grant a small bonus of 5 points for clearing the board.
+                    defaultRoom.currentPlayer?.let { it.score += 5 }
+                    if (defaultRoom.lives > 0) { defaultRoom.score += 5 }
+                    defaultRoom.currentPlayer = null
                     clear()
                     dropTiles()
+                } else {
+                    defaultRoom.nextRandomPlayer()
                 }
             }
-            detectAndRemoveMatches()  // TODO: Pretty sure this line is 100% pointless?
         }
     }
 
