@@ -1,11 +1,14 @@
 package com.marksfam
 
 import com.marksfam.engine.*
+import kotlinx.datetime.Clock
 import org.springframework.web.bind.annotation.RestController
 import java.lang.Thread.sleep
 import java.util.*
 import kotlin.collections.HashSet
 import kotlin.math.abs
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 val colorMeshPairs = listOf(
         Pair("#ff0000", "sphere"),  // TODO: Heart
@@ -18,10 +21,24 @@ val colorMeshPairs = listOf(
 
 @RestController
 class Match3: Controller() {
+    private val turnLengthForPlayer = HashMap<Player, Double>()
     private val dropSpeed = 10.0f
     val grid = Grid<Model?>(7, 7, null)
 
     var priorClick: Model? = null
+
+    val countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
+        println("Timer ended")
+        defaultRoom.currentPlayer?.let {
+            it.lives -= 1
+            println("Lives left: ${it.lives}")
+            if (defaultRoom.lives > 0) {
+                defaultRoom.lives -= 1
+                println("Room lives left: ${defaultRoom.lives}")
+            }
+            startTurn()
+        }
+    }
 
     fun onClick(playerId: UUID, it: Model) {
         if (playerId != defaultRoom.currentPlayer?.id) {
@@ -158,7 +175,7 @@ class Match3: Controller() {
                     clear()
                     dropTiles()
                 } else {
-                    defaultRoom.nextRandomPlayer()
+                    startTurn()
                 }
             }
         }
@@ -201,11 +218,23 @@ class Match3: Controller() {
     }
 
     fun startGame() {
-        defaultRoom.allPlayers().forEach { it.lives = 5; it.score = 0 }
+        defaultRoom.allPlayers().forEach {
+            it.lives = 5;
+            it.score = 0
+            turnLengthForPlayer[it] = 20_000.0
+        }
         defaultRoom.lives = 20
         defaultRoom.score = 0
-        defaultRoom.nextRandomPlayer()
         dropTiles()
+        startTurn()
+    }
+
+    fun startTurn() {
+        defaultRoom.nextRandomPlayer()?.let {
+            countdown.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
+            turnLengthForPlayer[it] = turnLengthForPlayer[it]!!.times(0.85)
+            println("Turn started - ends at ${countdown.endAt}")
+        }
     }
 
     override fun onJoin(player: Player) {

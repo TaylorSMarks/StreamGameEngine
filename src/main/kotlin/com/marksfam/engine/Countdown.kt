@@ -7,7 +7,7 @@ import kotlinx.datetime.until
 import java.util.*
 import kotlin.concurrent.schedule
 
-class Countdown(position: ScreenPosition, prefix: String, endAt: Instant, var action: () -> Unit) {
+class Countdown(position: ScreenPosition, var action: () -> Unit) {
     private val id = idGenerator.incrementAndGet()
     private val timer = Timer()
     private var task: TimerTask? = null
@@ -16,8 +16,6 @@ class Countdown(position: ScreenPosition, prefix: String, endAt: Instant, var ac
         controller.emitEvent("addCountdown",
             "x" to position.x,
             "y" to position.y,
-            "prefix" to prefix,
-            "endAt" to endAt.toEpochMilliseconds(),
             "id" to id)
     }
 
@@ -28,14 +26,16 @@ class Countdown(position: ScreenPosition, prefix: String, endAt: Instant, var ac
             "endAt" to endAt.toEpochMilliseconds())
     }
 
-    var prefix = prefix
+    var prefix = ""
         set(newPrefix) {
             field = newPrefix
+            changed()
         }
 
-    var endAt = endAt
+    var endAt = Instant.DISTANT_FUTURE
         set(newEndAt) {
             field = newEndAt
+            changed()
             task?.let { it.cancel() }
             task = timer.schedule(Clock.System.now().until(newEndAt, DateTimeUnit.MILLISECOND)) { action() }
         }
