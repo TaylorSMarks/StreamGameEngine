@@ -51,7 +51,7 @@
         }
 
         function moveModel(data) {
-          console.log(`Attempting to move model with id ${data.id}`);
+          console.log(`moveModel(${JSON.stringify(data)})`);
           const model = models[data.id];
           const fps = 30;
           const frames = fps * data.duration;
