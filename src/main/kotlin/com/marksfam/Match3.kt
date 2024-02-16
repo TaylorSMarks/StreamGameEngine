@@ -175,6 +175,9 @@ class Match3: Controller() {
                     clear()
                     dropTiles()
                 } else {
+                    defaultRoom.currentPlayer?.let {
+                        turnLengthForPlayer[it] = turnLengthForPlayer[it]!!.times(0.85)
+                    }
                     startTurn()
                 }
             }
@@ -219,7 +222,7 @@ class Match3: Controller() {
 
     fun startGame() {
         defaultRoom.allPlayers().forEach {
-            it.lives = 5;
+            it.lives = 5
             it.score = 0
             turnLengthForPlayer[it] = 20_000.0
         }
@@ -232,7 +235,6 @@ class Match3: Controller() {
     fun startTurn() {
         defaultRoom.nextRandomPlayer()?.let {
             countdown.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
-            turnLengthForPlayer[it] = turnLengthForPlayer[it]!!.times(0.85)
             println("Turn started - ends at ${countdown.endAt}")
         }
     }

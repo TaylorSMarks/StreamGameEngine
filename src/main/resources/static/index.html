@@ -20,10 +20,13 @@
     </style>
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
     <script src="LoadableMesh.js"></script>
     <script>
         const models = {};
+        const countdowns = {};
         var playerId = "deadbeef-dead-4000-beef-cafebabedead";
+        var adt = null;
 
         function welcome(data) {
             console.log(`welcome(${JSON.stringify(data)})`);
@@ -63,6 +66,26 @@
           delete models[data.id];
         }
 
+        function addCountdown(data) {
+            // TODO: Factor in the positioning info that's passed in...
+            // TODO: Continually update the displayed amount of time left...
+            var text = new BABYLON.GUI.TextBlock();
+            text.text = "Hello world";
+            text.color = "white";
+            text.fontSize = 24;
+            text.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+            countdowns[data.id] = {
+                textbox: text,
+                endAt: null
+            };
+            adt.addControl(text);
+        }
+
+        function changeCountdown(data) {
+            // TODO: Still keep updating the display amount of time left...
+            countdowns[data.id]['endAt'] = data.endAt;
+        }
+
         window.addEventListener('load', function() {
           const canvas = document.getElementById("renderCanvas");
           const engine = new BABYLON.Engine(canvas, true);
@@ -74,7 +97,9 @@
           // If you wanted it to be rotatable...
           //camera.attachControl(canvas, true);
 
-            new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+          new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+
+          adt = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
           engine.runRenderLoop(function () {
               scene.render();
@@ -86,10 +111,12 @@
           });
 
           const eventSource = new EventSource("event-stream");
-          eventSource.addEventListener("addModel",    (event) => { addModel   (JSON.parse(event.data)); });
-          eventSource.addEventListener("moveModel",   (event) => { moveModel  (JSON.parse(event.data)); });
-          eventSource.addEventListener("removeModel", (event) => { removeModel(JSON.parse(event.data)); });
-          eventSource.addEventListener("welcome",     (event) => { welcome    (JSON.parse(event.data)); });
+          eventSource.addEventListener("addModel",        (event) => { addModel       (JSON.parse(event.data)); });
+          eventSource.addEventListener("moveModel",       (event) => { moveModel      (JSON.parse(event.data)); });
+          eventSource.addEventListener("removeModel",     (event) => { removeModel    (JSON.parse(event.data)); });
+          eventSource.addEventListener("addCountdown",    (event) => { addCountdown   (JSON.parse(event.data)); });
+          eventSource.addEventListener("changeCountdown", (event) => { changeCountdown(JSON.parse(event.data)); });
+          eventSource.addEventListener("welcome",         (event) => { welcome        (JSON.parse(event.data)); });
         });
     </script>
 </head>
