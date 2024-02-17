@@ -13,6 +13,7 @@ class Countdown(position: ScreenPosition, var action: () -> Unit) {
     private var task: TimerTask? = null
 
     init {
+        println("Add countdown")
         controller.emitEvent("addCountdown",
             "x" to position.x,
             "y" to position.y,
@@ -20,6 +21,7 @@ class Countdown(position: ScreenPosition, var action: () -> Unit) {
     }
 
     private fun changed() {
+        println("Countdown changed")
         controller.emitEvent("changeCountdown",
             "id" to id,
             "prefix" to prefix,

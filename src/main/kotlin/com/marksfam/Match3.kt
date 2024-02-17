@@ -27,18 +27,7 @@ class Match3: Controller() {
 
     var priorClick: Model? = null
 
-    val countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
-        println("Timer ended")
-        defaultRoom.currentPlayer?.let {
-            it.lives -= 1
-            println("Lives left: ${it.lives}")
-            if (defaultRoom.lives > 0) {
-                defaultRoom.lives -= 1
-                println("Room lives left: ${defaultRoom.lives}")
-            }
-            startTurn()
-        }
-    }
+    var countdown: Countdown? = null
 
     fun onClick(playerId: UUID, it: Model) {
         if (playerId != defaultRoom.currentPlayer?.id) {
@@ -164,8 +153,8 @@ class Match3: Controller() {
         if (tilesDropping) {
             sleep(800)
             if (detectAndRemoveMatches() == 0) {
-                // If matches were found, we'd recurse into dropTiles anyways,
-                // so we only need to check if moves remain if matches were not found.
+                // If matches were found, we'd recurse into dropTiles anyway,
+                // so we only need to check if moves remain when matches were not found.
                 if (!doAnyMovesRemain()) {
                     println("No moves remain, so resetting board.")
                     // Grant a small bonus of 5 points for clearing the board.
@@ -221,6 +210,19 @@ class Match3: Controller() {
     }
 
     fun startGame() {
+        countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
+            println("Timer ended")
+            defaultRoom.currentPlayer?.let {
+                it.lives -= 1
+                println("Lives left: ${it.lives}")
+                if (defaultRoom.lives > 0) {
+                    defaultRoom.lives -= 1
+                    println("Room lives left: ${defaultRoom.lives}")
+                }
+                startTurn()
+            }
+        }
+
         defaultRoom.allPlayers().forEach {
             it.lives = 5
             it.score = 0
@@ -234,14 +236,15 @@ class Match3: Controller() {
 
     fun startTurn() {
         defaultRoom.nextRandomPlayer()?.let {
-            countdown.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
-            println("Turn started - ends at ${countdown.endAt}")
+            countdown?.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
+            println("Turn started - ends at ${countdown?.endAt}")
         }
     }
 
     override fun onJoin(player: Player) {
         // TODO: Send them a button allowing them to start the game.
         // TODO: Send to other players a message that a new player has joined the room.
+        // TODO: Let the newly joined player know about the countdown... perhaps we just don't create it until then?
         startGame()
     }
 }
