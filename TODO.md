@@ -1,7 +1,7 @@
-1. Make the countdown actually show the time left.
-2. Broadcast the current grid whenever a new player joins... maybe even give a new joiner lives?
-3. Pause the countdown when a swap starts. Penalize and resume if the swap is invalid.
-4. Button to start the game.
+1. Show players and scores.
+2. Button to start the game.
+3. Broadcast the current grid whenever a new player joins... maybe even give a new joiner lives?
+4. Pause the countdown when a swap starts. Penalize and resume if the swap is invalid.
 5. End the game when all players lose all their lives (or once a winner is determined?)
 6. Fix Bolt model.
 7. Implement addText, changeText, addCountdown, and changeCountdown in the javascript side.

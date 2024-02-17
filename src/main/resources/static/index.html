@@ -33,6 +33,15 @@
             playerId = data.playerId;
         }
 
+        function updateCountdowns() {
+            const now = Date.now();
+            for (const countdown of Object.values(countdowns)) {
+                if (countdown.endAt) {
+                    countdown.textbox.text = ((countdown.endAt - now) / 1000).toFixed(2);
+                }
+            }
+        }
+
         async function addModel(data) {
           console.log(`addModel(${JSON.stringify(data)})`);
           const name = `Model_${data.id}`;
@@ -86,7 +95,6 @@
 
         function changeCountdown(data) {
             console.log(`changeCountdown(${JSON.stringify(data)})`);
-            // TODO: Still keep updating the display amount of time left...
             countdowns[data.id]['endAt'] = data.endAt;
         }
 
@@ -106,6 +114,7 @@
           adt = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
           engine.runRenderLoop(function () {
+              updateCountdowns();
               scene.render();
           });
 
