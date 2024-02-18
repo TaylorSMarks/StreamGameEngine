@@ -1,8 +1,5 @@
 package com.marksfam.engine
 
-import kotlinx.datetime.Instant
-
-
 data class ScreenPosition(val x: Float, val y: Float)
 
 class Text(position: ScreenPosition, text: String) {
