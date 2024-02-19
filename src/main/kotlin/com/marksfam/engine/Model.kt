@@ -14,21 +14,9 @@ data class Position(val x: Int, val y: Int, val z: Int = 0) {
             sqrt((x - o.x).toFloat().pow(2) + (y - o.y).toFloat().pow(2) + (z - o.z).toFloat().pow(2))
 }
 
-class Model(position: Position, val color: String, val mesh: String, val onClick: ((UUID, Model) -> Unit)? = null) {
+class Model(position: Position, val color: String, val mesh: String, val onClick: ((UUID, Model) -> Unit)? = null): Visible {
     private val id = idGenerator.incrementAndGet()
     private var emittedViaMoveAlready = false
-
-    init {
-        models[id] = this
-        controller.emitEvent("addModel",
-            "x" to position.x,
-            "y" to position.y,
-            "z" to position.z,
-            "color" to color,
-            "id" to id,
-            "mesh" to mesh,
-            "clickable" to (onClick != null))
-    }
 
     var position = position
         set(newPosition) {
@@ -45,6 +33,23 @@ class Model(position: Position, val color: String, val mesh: String, val onClick
             }
         }
 
+    init {
+        models[id] = this
+        controller.defaultRoom.allPlayers().forEach { showTo(it) }
+        all.add(this)
+    }
+
+    override fun showTo(player: Player) {
+        player.emitEvent("addModel",
+                "x" to position.x,
+                "y" to position.y,
+                "z" to position.z,
+                "color" to color,
+                "id" to id,
+                "mesh" to mesh,
+                "clickable" to (onClick != null))
+    }
+
     fun move(newPosition: Position, speed: Float) {
         val duration = position.distanceTo(newPosition) / speed
         controller.emitEvent("moveModel",
@@ -59,5 +64,7 @@ class Model(position: Position, val color: String, val mesh: String, val onClick
 
     fun destroy() {
         controller.emitEvent("removeModel", "id" to id)
+        models.remove(id)
+        all.remove(this)
     }
 }

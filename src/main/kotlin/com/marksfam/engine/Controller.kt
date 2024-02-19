@@ -30,6 +30,11 @@ abstract class Controller {
 
         val player = Player(emitter)
         defaultRoom.addPlayer(player)
+        all.forEach {
+            if (it.visibleTo(player)) {
+                it.showTo(player)
+            }
+        }
         onJoin(player)
 
         return emitter

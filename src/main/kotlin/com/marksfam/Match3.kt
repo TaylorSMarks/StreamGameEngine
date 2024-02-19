@@ -23,6 +23,7 @@ val colorMeshPairs = listOf(
 class Match3: Controller() {
     private val turnLengthForPlayer = HashMap<Player, Double>()
     private val dropSpeed = 10.0f
+    private val initialTurnLength = 20_000.0
     val grid = Grid<Model?>(7, 7, null)
 
     var priorClick: Model? = null
@@ -226,7 +227,7 @@ class Match3: Controller() {
         defaultRoom.allPlayers().forEach {
             it.lives = 5
             it.score = 0
-            turnLengthForPlayer[it] = 20_000.0
+            turnLengthForPlayer[it] = initialTurnLength
         }
         defaultRoom.lives = 20
         defaultRoom.score = 0
@@ -245,6 +246,11 @@ class Match3: Controller() {
         // TODO: Send them a button allowing them to start the game.
         // TODO: Send to other players a message that a new player has joined the room.
         // TODO: Let the newly joined player know about the countdown... perhaps we just don't create it until then?
-        startGame()
+        if (countdown == null) {
+            startGame()
+        } else {
+            player.lives = 5
+            turnLengthForPlayer[player] = initialTurnLength
+        }
     }
 }

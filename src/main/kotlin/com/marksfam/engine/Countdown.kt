@@ -7,17 +7,31 @@ import kotlinx.datetime.until
 import java.util.*
 import kotlin.concurrent.schedule
 
-class Countdown(position: ScreenPosition, var action: () -> Unit) {
+class Countdown(val position: ScreenPosition, var action: () -> Unit): Visible {
     private val id = idGenerator.incrementAndGet()
     private val timer = Timer()
     private var task: TimerTask? = null
 
+    var endAt = Instant.DISTANT_FUTURE
+        set(newEndAt) {
+            field = newEndAt
+            changed()
+            task?.let { it.cancel() }
+            task = timer.schedule(Clock.System.now().until(newEndAt, DateTimeUnit.MILLISECOND)) { action() }
+        }
+
     init {
         println("Add countdown")
-        controller.emitEvent("addCountdown",
-            "x" to position.x,
-            "y" to position.y,
-            "id" to id)
+        controller.defaultRoom.allPlayers().forEach { showTo(it) }
+        all.add(this)
+    }
+
+    override fun showTo(player: Player) {
+        player.emitEvent("addCountdown",
+                "x" to position.x,
+                "y" to position.y,
+                "id" to id,
+                "endAt" to endAt.toEpochMilliseconds() )
     }
 
     private fun changed() {
@@ -32,13 +46,5 @@ class Countdown(position: ScreenPosition, var action: () -> Unit) {
         set(newPrefix) {
             field = newPrefix
             changed()
-        }
-
-    var endAt = Instant.DISTANT_FUTURE
-        set(newEndAt) {
-            field = newEndAt
-            changed()
-            task?.let { it.cancel() }
-            task = timer.schedule(Clock.System.now().until(newEndAt, DateTimeUnit.MILLISECOND)) { action() }
         }
 }
