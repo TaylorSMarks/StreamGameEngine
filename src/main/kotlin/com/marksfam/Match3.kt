@@ -244,8 +244,8 @@ class Match3: Controller() {
 
     override fun onJoin(player: Player) {
         // TODO: Send them a button allowing them to start the game.
-        // TODO: Send to other players a message that a new player has joined the room.
-        // TODO: Let the newly joined player know about the countdown... perhaps we just don't create it until then?
+        PlayerInfoCard(player, ScreenPosition(0f, 0.2f * defaultRoom.allPlayers().size))
+
         if (countdown == null) {
             startGame()
         } else {

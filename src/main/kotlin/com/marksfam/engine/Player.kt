@@ -8,16 +8,29 @@ import java.util.*
 
 val mapper = ObjectMapper()
 
+interface PlayerListener {
+    fun changed(player: Player)
+}
+
 class Player(val emitter: SseEmitter) {
     val id: UUID = UUID.randomUUID()
+    val listeners = ArrayList<PlayerListener>()
+
+    fun notifyListeners() {
+        listeners.forEach { it.changed(this) }
+    }
 
     var score: Int = 0
         set(newScore) {
             field = newScore
-            println("Score: $newScore")
+            notifyListeners()
         }
 
     var lives: Int = 0
+        set(newLives) {
+            field = newLives
+            notifyListeners()
+        }
 
     private fun emitEvent(event: Set<ResponseBodyEmitter.DataWithMediaType>) {
         emitter.send(event)

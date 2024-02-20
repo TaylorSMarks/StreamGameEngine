@@ -26,6 +26,7 @@
         const animations = {};
         const models = {};
         const countdowns = {};
+        const texts = {};
         var playerId = "deadbeef-dead-4000-beef-cafebabedead";
         var adt = null;
 
@@ -84,7 +85,7 @@
             console.log(`addCountdown(${JSON.stringify(data)})`);
             // TODO: Factor in the positioning info that's passed in...
             // TODO: Continually update the displayed amount of time left...
-            var text = new BABYLON.GUI.TextBlock();
+            const text = new BABYLON.GUI.TextBlock();
             text.text = "Hello world";
             text.color = "white";
             text.fontSize = 24;
@@ -101,6 +102,25 @@
         function changeCountdown(data) {
             console.log(`changeCountdown(${JSON.stringify(data)})`);
             countdowns[data.id]['endAt'] = data.endAt;
+        }
+
+        function addText(data) {
+            console.log(`addText(${JSON.stringify(data)})`);
+            const text = new BABYLON.GUI.TextBlock();
+            text.text = data.text;
+            text.color = "white";
+            text.fontSize = 24;
+            text.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+            text.top = `${data.y}%`;
+            text.left = `${data.x}%`;
+            text.height = (data.text.split("\n").length * 24) + "px";
+            texts[data.id] = text;
+            adt.addControl(text);
+        }
+
+        function changeText(data) {
+            console.log(`changeText(${JSON.stringify(data)})`);
+            texts[data.id].text = data.text;
         }
 
         window.addEventListener('load', function() {
@@ -134,6 +154,8 @@
           eventSource.addEventListener("removeModel",     (event) => { removeModel    (JSON.parse(event.data)); });
           eventSource.addEventListener("addCountdown",    (event) => { addCountdown   (JSON.parse(event.data)); });
           eventSource.addEventListener("changeCountdown", (event) => { changeCountdown(JSON.parse(event.data)); });
+          eventSource.addEventListener("addText",         (event) => { addText        (JSON.parse(event.data)); });
+          eventSource.addEventListener("changeText",      (event) => { changeText     (JSON.parse(event.data)); });
           eventSource.addEventListener("welcome",         (event) => { welcome        (JSON.parse(event.data)); });
         });
     </script>
