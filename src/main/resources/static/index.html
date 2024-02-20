@@ -23,6 +23,7 @@
     <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
     <script src="LoadableMesh.js"></script>
     <script>
+        const animations = {};
         const models = {};
         const countdowns = {};
         var playerId = "deadbeef-dead-4000-beef-cafebabedead";
@@ -42,7 +43,7 @@
             }
         }
 
-        async function addModel(data) {
+        function addModel(data) {
           console.log(`addModel(${JSON.stringify(data)})`);
           const name = `Model_${data.id}`;
           const newModel = (data.mesh === "sphere") ? BABYLON.MeshBuilder.CreateSphere(name) : new LoadableMesh(name, data.mesh);
@@ -67,12 +68,16 @@
           const model = models[data.id];
           const fps = 30;
           const frames = fps * data.duration;
-          BABYLON.Animation.CreateAndStartAnimation(`Move_Model_${data.id}`, model, 'position', fps, frames, model.position, new BABYLON.Vector3(data.x, data.y, data.z), BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+          if (animations[data.id]) {
+              animations[data.id].stop();
+          }
+          animations[data.id] = BABYLON.Animation.CreateAndStartAnimation(`Move_Model_${data.id}`, model, 'position', fps, frames, model.position, new BABYLON.Vector3(data.x, data.y, data.z), BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
         }
 
         function removeModel(data) {
           models[data.id].dispose();
           delete models[data.id];
+          delete animations[data.id];
         }
 
         function addCountdown(data) {
