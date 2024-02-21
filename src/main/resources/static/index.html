@@ -111,9 +111,11 @@
             text.color = "white";
             text.fontSize = 24;
             text.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-            text.top = `${data.y}%`;
-            text.left = `${data.x}%`;
+            text.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+            text.top = `${data.y * 100}%`;
+            text.left = `${data.x * 100}%`;
             text.height = (data.text.split("\n").length * 24) + "px";
+            text.width = "200px";
             texts[data.id] = text;
             adt.addControl(text);
         }
