@@ -23,13 +23,38 @@ fun cap(center: Int, l: List<Int>): List<Int> {
 }
 
 fun dogEar(l: List<Int>): List<Int> {
-    TODO("Take the first two + last, then the last two + second, the second and third + second from last, and so on...")
+    var i = 0
+    var j = l.size - 1
+    val ret = ArrayList<Int>()
+    while (i < j) {
+        ret.addAll(listOf(l[i], l[i + 1], l[j]))
+        if (i + 1 < j - 1) {
+            ret.addAll(listOf(l[i + 1], l[j - 1], l[j]))
+        }
+        i += 1
+        j -= 1
+    }
+
+    return ret
 }
 
 fun extrude(base: List<Vertex>, offsetsAndScales: List<Pair<Float, Float>>): Mesh {
-    TODO("Write this.")
-    // TODO: Also include running dogEar on the top and bottom to complete making the Mesh.
-    // TODO: Once this is done, rewrite bolt using it, and also write... all the remaining shapes with it.
+    val verts = ArrayList<Vertex>(base.size * (offsetsAndScales.size + 1))
+    verts.addAll(base)
+    for ((offset, scale) in offsetsAndScales) {
+        for (baseVert in base) {
+            verts.add(Vertex(baseVert.x * scale, baseVert.y * scale, offset.toDouble()))
+        }
+    }
+
+    val indexes = ArrayList<Int>()
+
+    // TODO: Build the side rects.
+    // TODO: Run dogEar on the top and bottom to complete making the Mesh.
+    // TODO: Rewrite Bolt and then write all the others using this.
+    //       Although... no matter what I think of, snowflake will suck to do...
+    // TODO: Test once it's done...
+    return Mesh(verts, indexes)
 }
 
 data class Mesh(val vertexes: List<Vertex>, val indices: List<Int>) {
