@@ -46,6 +46,16 @@ abstract class Controller {
         models[modelId]?.let { it.onClick?.invoke(playerId, it) }
     }
 
+    @GetMapping("/clickButton/{playerId}/{buttonId}")
+    fun clickButton(@PathVariable playerId: UUID, @PathVariable buttonId: Long) {
+        Button.instances[buttonId]?.let { it.onClick(playerId) }
+    }
+
+    @GetMapping("/getText/{playerId}/{textId}/{text}")
+    fun gotText(@PathVariable playerId: UUID, @PathVariable textId: Long, @PathVariable text: String) {
+        TextInput.instances[textId]?.let { it.handleMap[playerId]?.invoke(text) }
+    }
+
     @GetMapping("/mesh/{name}")
     fun getMesh(@PathVariable name: String): Map<String, List<Number>> {
         println("GET mesh/$name")

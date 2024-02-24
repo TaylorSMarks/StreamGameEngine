@@ -15,10 +15,23 @@ interface PlayerListener {
 class Player(val emitter: SseEmitter) {
     val id: UUID = UUID.randomUUID()
     val listeners = ArrayList<PlayerListener>()
+    companion object {
+        val instances = HashMap<UUID, Player>()
+    }
+
+    init {
+        instances[id] = this
+    }
 
     fun notifyListeners() {
         listeners.forEach { it.changed(this) }
     }
+
+    var name: String = ""
+        set(newName) {
+            field = newName
+            notifyListeners()
+        }
 
     var score: Int = 0
         set(newScore) {

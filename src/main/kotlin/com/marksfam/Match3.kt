@@ -31,6 +31,19 @@ class Match3: Controller() {
 
     var countdown: Countdown? = null
 
+    val nameTextInput = TextInput(ScreenPosition(0.5f, 0.5f))
+    val startGameButton = Button(ScreenPosition(0.5f, 0.75f), "Start Game") { startGame() }
+    val joinGameButton = Button(ScreenPosition(0.5f, 0.625f), "Join Game") {
+        Player.instances[it]?.let {
+            val player = it
+            nameTextInput.get(player) {
+                player.name = it
+                // TODO: Hide nameTextInput and joinGameButton
+                // TODO: Show startGameButton
+            }
+        }
+    }
+
     fun onClick(playerId: UUID, it: Model) {
         if (playerId != defaultRoom.currentPlayer?.id) {
             println("Discard click from non-current player.")
@@ -213,6 +226,8 @@ class Match3: Controller() {
     }
 
     fun startGame() {
+        // TODO: Hide startGameButton, joinGameButton, and nameTextInput
+        clear()  // If there's already a board for some reason, make sure to dispose of it.
         countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
             println("Timer ended")
             defaultRoom.currentPlayer?.let {
@@ -237,10 +252,20 @@ class Match3: Controller() {
         startTurn()
     }
 
+    fun endGame() {
+        countdown?.pause()
+        // TODO: Say who won.
+        // TODO: Show nameTextInput and joinGameButton (which will then permit them to hit the startGame button...)
+    }
+
     fun startTurn() {
         defaultRoom.nextRandomPlayer()?.let {
             countdown?.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
             println("Turn started - ends at ${countdown?.endAt}")
+        }
+
+        if (defaultRoom.currentPlayer == null) {
+            endGame()
         }
     }
 
