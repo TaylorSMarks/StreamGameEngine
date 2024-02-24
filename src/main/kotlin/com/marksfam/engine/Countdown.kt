@@ -6,6 +6,8 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.until
 import java.util.*
 import kotlin.concurrent.schedule
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 class Countdown(val position: ScreenPosition, var action: () -> Unit): Visible {
     private val id = idGenerator.incrementAndGet()
@@ -17,7 +19,18 @@ class Countdown(val position: ScreenPosition, var action: () -> Unit): Visible {
             field = newEndAt
             changed()
             task?.let { it.cancel() }
-            task = timer.schedule(Clock.System.now().until(newEndAt, DateTimeUnit.MILLISECOND)) { action() }
+            val msLeft = Clock.System.now().until(newEndAt, DateTimeUnit.MILLISECOND)
+            if (msLeft <= 0) {
+                action()
+            } else {
+                task = timer.schedule(msLeft) { action() }
+            }
+        }
+
+    var endIn: Duration
+        get() = endAt - Clock.System.now()
+        set(newEndIn) {
+            endAt = Clock.System.now() + newEndIn
         }
 
     init {
@@ -35,11 +48,18 @@ class Countdown(val position: ScreenPosition, var action: () -> Unit): Visible {
     }
 
     private fun changed() {
-        println("Countdown changed")
         controller.emitEvent("changeCountdown",
             "id" to id,
             "prefix" to prefix,
             "endAt" to endAt.toEpochMilliseconds())
+    }
+
+    fun pause() {
+        task?.let { it.cancel() }
+        controller.emitEvent("pauseCountdown",
+                "id" to id,
+                "prefix" to prefix,
+                "pauseAt" to "%.2f".format(endIn.toDouble(DurationUnit.SECONDS)))
     }
 
     var prefix = ""

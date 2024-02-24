@@ -9,6 +9,7 @@ import kotlin.collections.HashSet
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 val colorMeshPairs = listOf(
         Pair("#ff0000", "sphere"),  // TODO: Heart
@@ -44,7 +45,7 @@ class Match3: Controller() {
         priorClick?.let { pc ->
             if (abs(pc.position.x - it.position.x) + abs(pc.position.y - it.position.y) == 1) {
                 // They're adjacent. So swap them!
-                // TODO: Pause the countdown during the animation.
+                countdown?.pause()
                 val pcPosition = pc.position
                 pc.position = it.position
                 it.position = pcPosition
@@ -54,8 +55,9 @@ class Match3: Controller() {
                 sleep(500)
                 if (detectAndRemoveMatches() == 0) {
                     // The swap wasn't valid, so undo it.
-                    // TODO: Once the undo animation is done, apply a penalty to the countdown and resume it.
-                    // TODO: Check if the countdown reached zero from the penalty - deduct a life and pick a new player.
+                    countdown?.let {
+                        it.endIn -= 2.seconds
+                    }
                     it.position = pc.position
                     pc.position = pcPosition
                     grid[it.position.x, it.position.y] = it

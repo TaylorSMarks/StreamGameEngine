@@ -40,6 +40,8 @@
             for (const countdown of Object.values(countdowns)) {
                 if (countdown.endAt) {
                     countdown.textbox.text = ((countdown.endAt - now) / 1000).toFixed(2);
+                } else if (countdown.pauseAt) {
+                    countdown.textbox.text = countdown.pauseAt;
                 }
             }
         }
@@ -94,7 +96,8 @@
             text.height = "24px";
             countdowns[data.id] = {
                 textbox: text,
-                endAt: null
+                endAt: null,
+                pauseAt: null
             };
             adt.addControl(text);
         }
@@ -102,6 +105,12 @@
         function changeCountdown(data) {
             console.log(`changeCountdown(${JSON.stringify(data)})`);
             countdowns[data.id]['endAt'] = data.endAt;
+        }
+
+        function pauseCountdown(data) {
+            console.log(`pauseCountdown(${JSON.stringify(data)})`);
+            countdowns[data.id]['endAt'] = null;
+            countdowns[data.id]['pauseAt'] = data.pauseAt;
         }
 
         function addText(data) {
@@ -156,6 +165,7 @@
           eventSource.addEventListener("removeModel",     (event) => { removeModel    (JSON.parse(event.data)); });
           eventSource.addEventListener("addCountdown",    (event) => { addCountdown   (JSON.parse(event.data)); });
           eventSource.addEventListener("changeCountdown", (event) => { changeCountdown(JSON.parse(event.data)); });
+          eventSource.addEventListener("pauseCountdown",  (event) => { pauseCountdown (JSON.parse(event.data)); });
           eventSource.addEventListener("addText",         (event) => { addText        (JSON.parse(event.data)); });
           eventSource.addEventListener("changeText",      (event) => { changeText     (JSON.parse(event.data)); });
           eventSource.addEventListener("welcome",         (event) => { welcome        (JSON.parse(event.data)); });
