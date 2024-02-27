@@ -58,6 +58,7 @@ class Button(val position: ScreenPosition, val text: String, val onClick: ((UUID
         player.emitEvent("addButton",
                 "x" to position.x,
                 "y" to position.y,
+                "text" to text,
                 "id" to id)
     }
 }

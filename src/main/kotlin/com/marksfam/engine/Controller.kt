@@ -72,8 +72,12 @@ abstract class Controller {
         emitters.forEach {
             try {
                 it.send(built)
-            } catch (e: IOException) {
-                failedEmitters.add(it)
+            } catch (e: Exception) {
+                when(e) {
+                    is IOException, is IllegalStateException -> {
+                        failedEmitters.add(it)
+                    } else -> throw e
+                }
             }
         }
         emitters.removeAll(failedEmitters)

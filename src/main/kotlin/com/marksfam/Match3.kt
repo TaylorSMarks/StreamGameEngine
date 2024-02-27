@@ -274,7 +274,7 @@ class Match3: Controller() {
         PlayerInfoCard(player, ScreenPosition(0f, 0.2f * defaultRoom.allPlayers().size))
 
         if (countdown == null) {
-            startGame()
+            //startGame()
         } else {
             player.lives = 5
             turnLengthForPlayer[player] = initialTurnLength

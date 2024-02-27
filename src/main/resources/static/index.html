@@ -25,8 +25,10 @@
     <script>
         const animations = {};
         const models = {};
+        const buttons = {};
         const countdowns = {};
         const texts = {};
+        const textInputs = {};
         var playerId = "deadbeef-dead-4000-beef-cafebabedead";
         var adt = null;
 
@@ -39,7 +41,12 @@
             const now = Date.now();
             for (const countdown of Object.values(countdowns)) {
                 if (countdown.endAt) {
-                    countdown.textbox.text = ((countdown.endAt - now) / 1000).toFixed(2);
+                    const msLeft = countdown.endAt - now;
+                    if (countdown.stopAtEnd && msLeft < 0) {
+                        countdown.textbox.text = "0.00";
+                    } else {
+                        countdown.textbox.text = (msLeft / 1000).toFixed(2);
+                    }
                 } else if (countdown.pauseAt) {
                     countdown.textbox.text = countdown.pauseAt;
                 }
@@ -97,7 +104,8 @@
             countdowns[data.id] = {
                 textbox: text,
                 endAt: null,
-                pauseAt: null
+                pauseAt: null,
+                stopAtEnd: data.stopAtEnd
             };
             adt.addControl(text);
         }
@@ -134,6 +142,37 @@
             texts[data.id].text = data.text;
         }
 
+        function addButton(data) {
+            console.log(`addButton(${JSON.stringify(data)})`);
+            const button = BABYLON.GUI.Button.CreateSimpleButton(data.id, data.text);
+            button.height = "48px";
+            button.color = "white";
+            button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+            button.top = `${data.y * 100}%`;
+            button.onPointerUpObservable.add(function(position, event) {
+                fetch(`/clickButton/${playerId}/${data.id}`);
+            });
+            buttons[data.id] = button;
+            adt.addControl(button);
+        }
+
+        function addTextInput(data) {
+            console.log(`addTextInput(${JSON.stringify(data)})`);
+            const inputText = new BABYLON.GUI.InputText();
+            inputText.height = "48px";
+            inputText.width = "384px";
+            inputText.color = "white";
+            textInputs[data.id] = inputText;
+            adt.addControl(inputText);
+        }
+
+        function getTextInput(data) {
+            console.log(`getTextInput(${JSON.stringify(data)})`);
+            const text = textInputs[data.id].text;
+            console.log(`Sending: ${text}`);
+            fetch(`/getText/${playerId}/${data.id}/${text}`);
+        }
+
         window.addEventListener('load', function() {
           const canvas = document.getElementById("renderCanvas");
           const engine = new BABYLON.Engine(canvas, true);
@@ -168,6 +207,9 @@
           eventSource.addEventListener("pauseCountdown",  (event) => { pauseCountdown (JSON.parse(event.data)); });
           eventSource.addEventListener("addText",         (event) => { addText        (JSON.parse(event.data)); });
           eventSource.addEventListener("changeText",      (event) => { changeText     (JSON.parse(event.data)); });
+          eventSource.addEventListener("addButton",       (event) => { addButton      (JSON.parse(event.data)); });
+          eventSource.addEventListener("addTextInput",    (event) => { addTextInput   (JSON.parse(event.data)); });
+          eventSource.addEventListener("getTextInput",    (event) => { getTextInput   (JSON.parse(event.data)); });
           eventSource.addEventListener("welcome",         (event) => { welcome        (JSON.parse(event.data)); });
         });
     </script>

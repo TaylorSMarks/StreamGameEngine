@@ -9,7 +9,9 @@ import kotlin.concurrent.schedule
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-class Countdown(val position: ScreenPosition, var action: () -> Unit): Visible {
+class Countdown(val position: ScreenPosition, val stopAtEnd: Boolean, var action: () -> Unit): Visible {
+    constructor(position: ScreenPosition, action: () -> Unit) : this(position, true, action)
+
     private val id = idGenerator.incrementAndGet()
     private val timer = Timer()
     private var task: TimerTask? = null
@@ -44,6 +46,7 @@ class Countdown(val position: ScreenPosition, var action: () -> Unit): Visible {
                 "x" to position.x,
                 "y" to position.y,
                 "id" to id,
+                "stopAtEnd" to stopAtEnd,
                 "endAt" to endAt.toEpochMilliseconds() )
     }
 
