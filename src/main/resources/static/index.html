@@ -151,11 +151,17 @@
             button.color = "white";
             button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
             button.top = `${data.y * 100}%`;
+            button.isVisible = !data.hidden;
             button.onPointerUpObservable.add(function(position, event) {
                 fetch(`/clickButton/${playerId}/${data.id}`);
             });
             buttons[data.id] = button;
             adt.addControl(button);
+        }
+
+        function changeButton(data) {
+            console.log(`changeButton(${JSON.stringify(data)})`);
+            buttons[data.id].isVisible = !data.hidden;
         }
 
         function addTextInput(data) {
@@ -164,6 +170,7 @@
             inputText.height = "48px";
             inputText.width = "384px";
             inputText.color = "white";
+            inputText.isVisible = !data.hidden;
             textInputs[data.id] = inputText;
             adt.addControl(inputText);
         }
@@ -173,6 +180,11 @@
             const text = textInputs[data.id].text;
             console.log(`Sending: ${text}`);
             fetch(`/getText/${playerId}/${data.id}/${text}`);
+        }
+
+        function changeTextInput(data) {
+            console.log(`changeTextInput(${JSON.stringify(data)})`);
+            textInputs[data.id].isVisible = !data.hidden;
         }
 
         window.addEventListener('load', function() {
@@ -204,8 +216,8 @@
           for (let f of [
               addModel, moveModel, removeModel,
               addCountdown, changeCountdown, pauseCountdown,
-              addText, changeText, addButton,
-              addTextInput, getTextInput, welcome]) {
+              addText, changeText, addButton, changeButton,
+              addTextInput, getTextInput, changeTextInput, welcome]) {
               eventSource.addEventListener(f.name, (event) => { f(JSON.parse(event.data)); });
           }
         });

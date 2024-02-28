@@ -41,11 +41,23 @@ open class Text(val position: ScreenPosition, text: String): Visible {
     }
 }
 
-class Button(val position: ScreenPosition, val text: String, val onClick: ((UUID) -> Unit)): Visible {
+class Button(val position: ScreenPosition, val text: String, val startVisible: Boolean, val onClick: ((UUID) -> Unit)): Visible {
+    constructor(position: ScreenPosition, text: String, onClick: ((UUID) -> Unit)) : this(position, text, true, onClick)
+
     private val id = idGenerator.incrementAndGet()
+    private val hiddenFrom = HashSet<Player>()
 
     companion object {
         val instances = HashMap<Long, Button>()
+    }
+
+    fun setVisibleTo(player: Player, visible: Boolean) {
+        val changed = if (visible) hiddenFrom.remove(player) else hiddenFrom.add(player)
+        if (changed) {
+            player.emitEvent("changeButton",
+                    "id" to id,
+                    "hidden" to !visible)
+        }
     }
 
     init {
@@ -55,16 +67,22 @@ class Button(val position: ScreenPosition, val text: String, val onClick: ((UUID
     }
 
     override fun showTo(player: Player) {
+        if (!startVisible) {
+            hiddenFrom.add(player)
+        }
+
         player.emitEvent("addButton",
                 "x" to position.x,
                 "y" to position.y,
                 "text" to text,
+                "hidden" to !startVisible,
                 "id" to id)
     }
 }
 
 class TextInput(val position: ScreenPosition): Visible {
     private val id = idGenerator.incrementAndGet()
+    private val hiddenFrom = HashSet<Player>()
     val handleMap = HashMap<UUID, (String) -> Unit>()
 
     companion object {
@@ -75,6 +93,15 @@ class TextInput(val position: ScreenPosition): Visible {
         controller.defaultRoom.allPlayers().forEach { showTo(it) }
         all.add(this)
         instances[id] = this
+    }
+
+    fun setVisibleTo(player: Player, visible: Boolean) {
+        val changed = if (visible) hiddenFrom.remove(player) else hiddenFrom.add(player)
+        if (changed) {
+            player.emitEvent("changeTextInput",
+                    "id" to id,
+                    "hidden" to !visible)
+        }
     }
 
     override fun showTo(player: Player) {

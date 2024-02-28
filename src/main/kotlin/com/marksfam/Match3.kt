@@ -32,14 +32,19 @@ class Match3: Controller() {
     var countdown: Countdown? = null
 
     val nameTextInput = TextInput(ScreenPosition(0.5f, 0.5f))
-    val startGameButton = Button(ScreenPosition(0.5f, 0.75f), "Start Game") { startGame() }
-    val joinGameButton = Button(ScreenPosition(0.5f, 0.625f), "Join Game") {
-        Player.instances[it]?.let {
-            val player = it
-            nameTextInput.get(player) {
-                player.name = it
-                // TODO: Hide nameTextInput and joinGameButton
-                // TODO: Show startGameButton
+    val startGameButton = Button(ScreenPosition(0.5f, 0.75f), "Start Game", false) { startGame() }
+
+    lateinit var joinGameButton: Button
+
+    init {
+        joinGameButton = Button(ScreenPosition(0.5f, 0.625f), "Join Game") {
+            Player.instances[it]?.let { player ->
+                nameTextInput.get(player) {
+                    player.name = it
+                    nameTextInput.setVisibleTo(player, false)
+                    joinGameButton.setVisibleTo(player, false)
+                    startGameButton.setVisibleTo(player, true)
+                }
             }
         }
     }
@@ -226,7 +231,6 @@ class Match3: Controller() {
     }
 
     fun startGame() {
-        // TODO: Hide startGameButton, joinGameButton, and nameTextInput
         // TODO: Don't just create a new countdown repeatedly...
         clear()  // If there's already a board for some reason, make sure to dispose of it.
         countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
@@ -246,6 +250,9 @@ class Match3: Controller() {
             it.lives = 5
             it.score = 0
             turnLengthForPlayer[it] = initialTurnLength
+            startGameButton.setVisibleTo(it, false)
+            joinGameButton.setVisibleTo(it, false)
+            nameTextInput.setVisibleTo(it, false)
         }
         defaultRoom.lives = 20
         defaultRoom.score = 0
@@ -256,6 +263,10 @@ class Match3: Controller() {
     fun endGame() {
         countdown?.pause()
         // TODO: Say who won.
+        defaultRoom.allPlayers().forEach {
+            joinGameButton.setVisibleTo(it, true)
+            nameTextInput.setVisibleTo(it, true)
+        }
         // TODO: Show nameTextInput and joinGameButton (which will then permit them to hit the startGame button...)
     }
 
