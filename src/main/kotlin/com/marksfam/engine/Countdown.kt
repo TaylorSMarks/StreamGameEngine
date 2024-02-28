@@ -46,6 +46,7 @@ class Countdown(val position: ScreenPosition, val stopAtEnd: Boolean, var action
                 "x" to position.x,
                 "y" to position.y,
                 "id" to id,
+                "prefix" to prefix,
                 "stopAtEnd" to stopAtEnd,
                 "endAt" to endAt.toEpochMilliseconds() )
     }

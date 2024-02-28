@@ -43,12 +43,12 @@
                 if (countdown.endAt) {
                     const msLeft = countdown.endAt - now;
                     if (countdown.stopAtEnd && msLeft < 0) {
-                        countdown.textbox.text = "0.00";
+                        countdown.textbox.text = `${countdown.prefix}\n0.00`;
                     } else {
-                        countdown.textbox.text = (msLeft / 1000).toFixed(2);
+                        countdown.textbox.text = `${countdown.prefix}\n${(msLeft / 1000).toFixed(2)}`;
                     }
                 } else if (countdown.pauseAt) {
-                    countdown.textbox.text = countdown.pauseAt;
+                    countdown.textbox.text = `${countdown.prefix}\n${countdown.pauseAt}`;
                 }
             }
         }
@@ -99,9 +99,10 @@
             text.fontSize = 24;
             text.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
             text.top = 0;
-            text.height = "24px";
+            text.height = "48px";
             countdowns[data.id] = {
                 textbox: text,
+                prefix: data.prefix,
                 endAt: null,
                 pauseAt: null,
                 stopAtEnd: data.stopAtEnd
@@ -112,6 +113,7 @@
         function changeCountdown(data) {
             console.log(`changeCountdown(${JSON.stringify(data)})`);
             countdowns[data.id]['endAt'] = data.endAt;
+            countdowns[data.id]['prefix'] = data.prefix;
         }
 
         function pauseCountdown(data) {
@@ -145,6 +147,7 @@
             console.log(`addButton(${JSON.stringify(data)})`);
             const button = BABYLON.GUI.Button.CreateSimpleButton(data.id, data.text);
             button.height = "48px";
+            button.width = "384px";
             button.color = "white";
             button.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
             button.top = `${data.y * 100}%`;

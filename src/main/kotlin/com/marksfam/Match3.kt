@@ -227,6 +227,7 @@ class Match3: Controller() {
 
     fun startGame() {
         // TODO: Hide startGameButton, joinGameButton, and nameTextInput
+        // TODO: Don't just create a new countdown repeatedly...
         clear()  // If there's already a board for some reason, make sure to dispose of it.
         countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
             println("Timer ended")
@@ -260,8 +261,10 @@ class Match3: Controller() {
 
     fun startTurn() {
         defaultRoom.nextRandomPlayer()?.let {
-            countdown?.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
-            println("Turn started - ends at ${countdown?.endAt}")
+            countdown?.let { cd ->
+                cd.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
+                cd.prefix = "${it.name}'s Turn"
+            }
         }
 
         if (defaultRoom.currentPlayer == null) {
