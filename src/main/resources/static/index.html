@@ -201,18 +201,13 @@
           });
 
           const eventSource = new EventSource("event-stream");
-          eventSource.addEventListener("addModel",        (event) => { addModel       (JSON.parse(event.data)); });
-          eventSource.addEventListener("moveModel",       (event) => { moveModel      (JSON.parse(event.data)); });
-          eventSource.addEventListener("removeModel",     (event) => { removeModel    (JSON.parse(event.data)); });
-          eventSource.addEventListener("addCountdown",    (event) => { addCountdown   (JSON.parse(event.data)); });
-          eventSource.addEventListener("changeCountdown", (event) => { changeCountdown(JSON.parse(event.data)); });
-          eventSource.addEventListener("pauseCountdown",  (event) => { pauseCountdown (JSON.parse(event.data)); });
-          eventSource.addEventListener("addText",         (event) => { addText        (JSON.parse(event.data)); });
-          eventSource.addEventListener("changeText",      (event) => { changeText     (JSON.parse(event.data)); });
-          eventSource.addEventListener("addButton",       (event) => { addButton      (JSON.parse(event.data)); });
-          eventSource.addEventListener("addTextInput",    (event) => { addTextInput   (JSON.parse(event.data)); });
-          eventSource.addEventListener("getTextInput",    (event) => { getTextInput   (JSON.parse(event.data)); });
-          eventSource.addEventListener("welcome",         (event) => { welcome        (JSON.parse(event.data)); });
+          for (let f of [
+              addModel, moveModel, removeModel,
+              addCountdown, changeCountdown, pauseCountdown,
+              addText, changeText, addButton,
+              addTextInput, getTextInput, welcome]) {
+              eventSource.addEventListener(f.name, (event) => { f(JSON.parse(event.data)); });
+          }
         });
     </script>
 </head>
