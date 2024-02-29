@@ -29,7 +29,18 @@ class Match3: Controller() {
 
     var priorClick: Model? = null
 
-    var countdown: Countdown? = null
+    val countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
+        println("Timer ended")
+        defaultRoom.currentPlayer?.let {
+            it.lives -= 1
+            println("Lives left: ${it.lives}")
+            if (defaultRoom.lives > 0) {
+                defaultRoom.lives -= 1
+                println("Room lives left: ${defaultRoom.lives}")
+            }
+            startTurn()
+        }
+    }
 
     val nameTextInput = TextInput(ScreenPosition(0.5f, 0.5f))
     val startGameButton = Button(ScreenPosition(0.5f, 0.75f), "Start Game", false) { startGame() }
@@ -63,7 +74,7 @@ class Match3: Controller() {
         priorClick?.let { pc ->
             if (abs(pc.position.x - it.position.x) + abs(pc.position.y - it.position.y) == 1) {
                 // They're adjacent. So swap them!
-                countdown?.pause()
+                countdown.pause()
                 val pcPosition = pc.position
                 pc.position = it.position
                 it.position = pcPosition
@@ -73,9 +84,7 @@ class Match3: Controller() {
                 sleep(500)
                 if (detectAndRemoveMatches() == 0) {
                     // The swap wasn't valid, so undo it.
-                    countdown?.let {
-                        it.endIn -= 2.seconds
-                    }
+                    countdown.endIn -= 2.seconds
                     it.position = pc.position
                     pc.position = pcPosition
                     grid[it.position.x, it.position.y] = it
@@ -231,21 +240,7 @@ class Match3: Controller() {
     }
 
     fun startGame() {
-        // TODO: Don't just create a new countdown repeatedly...
         clear()  // If there's already a board for some reason, make sure to dispose of it.
-        countdown = Countdown(ScreenPosition(0.5f, 1.0f)) {
-            println("Timer ended")
-            defaultRoom.currentPlayer?.let {
-                it.lives -= 1
-                println("Lives left: ${it.lives}")
-                if (defaultRoom.lives > 0) {
-                    defaultRoom.lives -= 1
-                    println("Room lives left: ${defaultRoom.lives}")
-                }
-                startTurn()
-            }
-        }
-
         defaultRoom.allPlayers().forEach {
             it.lives = 5
             it.score = 0
@@ -261,21 +256,18 @@ class Match3: Controller() {
     }
 
     fun endGame() {
-        countdown?.pause()
+        countdown.pause()
         // TODO: Say who won.
         defaultRoom.allPlayers().forEach {
             joinGameButton.setVisibleTo(it, true)
             nameTextInput.setVisibleTo(it, true)
         }
-        // TODO: Show nameTextInput and joinGameButton (which will then permit them to hit the startGame button...)
     }
 
     fun startTurn() {
         defaultRoom.nextRandomPlayer()?.let {
-            countdown?.let { cd ->
-                cd.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
-                cd.prefix = "${it.name}'s Turn"
-            }
+            countdown.endAt = Clock.System.now() + turnLengthForPlayer[it]!!.roundToInt().milliseconds
+            countdown.prefix = "${it.name}'s Turn"
         }
 
         if (defaultRoom.currentPlayer == null) {
@@ -284,14 +276,8 @@ class Match3: Controller() {
     }
 
     override fun onJoin(player: Player) {
-        // TODO: Send them a button allowing them to start the game.
         PlayerInfoCard(player, ScreenPosition(0f, 0.2f * defaultRoom.allPlayers().size))
-
-        if (countdown == null) {
-            //startGame()
-        } else {
-            player.lives = 5
-            turnLengthForPlayer[player] = initialTurnLength
-        }
+        player.lives = 5
+        turnLengthForPlayer[player] = initialTurnLength
     }
 }
