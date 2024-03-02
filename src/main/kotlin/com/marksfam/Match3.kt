@@ -15,8 +15,8 @@ val colorMeshPairs = listOf(
         Pair("#ff0000", "sphere"),  // TODO: Heart
         Pair("#ff8800", "bolt"),
         Pair("#ffff00", "star"),
-        Pair("#00ff00", "sphere"),  // TODO: Rupee
-        Pair("#4444ff", "sphere"),  // TODO: Raindrop
+        Pair("#00ff00", "rupee"),
+        Pair("#4444ff", "drop"),
         Pair("#bb00bb", "sphere"),  // TODO: Crescent
         Pair("#ffffff", "sphere"))  // TODO: Snowflake
 

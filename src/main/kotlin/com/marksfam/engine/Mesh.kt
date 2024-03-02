@@ -22,38 +22,111 @@ fun cap(center: Int, l: List<Int>): List<Int> {
     }
 }
 
-fun dogEar(l: List<Int>): List<Int> {
-    var i = 0
-    var j = l.size - 1
+fun isConvex(a: Vertex, b: Vertex, c: Vertex): Boolean {
+    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) >= 0
+}
+
+fun inTriangle(a: Vertex, b: Vertex, c: Vertex, p: Vertex): Boolean {
+    val eps = 0.0000001
+    val bcy = b.y - c.y
+    val pcx = p.x - c.x
+    val cbx = c.x - b.x
+    val pcy = p.y - c.y
+    val acx = a.x - c.x
+    val acy = a.y - c.y
+    val l0 = (bcy * pcx + cbx * pcy) / ((bcy * acx + cbx * acy) + eps)
+    if (l0 !in 0.0..1.0) {
+        return false
+    }
+
+    val l1 = ((c.y - a.y) * pcx + acx * pcy) / ((bcy * acx + cbx * acy) + eps)
+    if (l1 !in 0.0..1.0) {
+        return false
+    }
+
+    val l2 = 1 - l0 - l1
+    return (l2 in 0.0..1.0)
+}
+
+fun earClip(base: List<Vertex>): List<Int> {
+    val l = base.mapIndexed { i, vertex -> Pair(vertex, i) }.toMutableList()
     val ret = ArrayList<Int>()
-    while (i < j) {
-        ret.addAll(listOf(l[i], l[i + 1], l[j]))
-        if (i + 1 < j - 1) {
-            ret.addAll(listOf(l[i + 1], l[j - 1], l[j]))
+
+    repeat(l.size - 3) {
+        // Get 3 sequential pairs from the list l.
+        for (li in l.indices) {
+            val a = l[li]
+            val b = l[(li + 1) % l.size]
+            val c = l[(li + 2) % l.size]
+
+            if (!isConvex(a.first, b.first, c.first)) {
+                continue
+            }
+
+            // Verify that no other point lies within the triangle abc.
+            var maybeEar = true
+            for (li2 in l.indices) {
+                if (li2 != li && li2 != ((li + 1) % l.size) && li2 != ((li + 2) % l.size) && inTriangle(a.first, b.first, c.first, l[li2].first)) {
+                    maybeEar = false
+                    break
+                }
+            }
+
+            if (!maybeEar) {
+                continue
+            }
+
+            ret.addAll(listOf(a.second, b.second, c.second))
+            l.removeAt((li + 1) % l.size)
+            break
         }
-        i += 1
-        j -= 1
+    }
+
+    if (l.size == 3) {
+        ret.addAll(l.map { it.second })
+    } else {
+        throw Exception("Something went wrong while running earClip... l.size=${l.size}")
     }
 
     return ret
 }
 
-fun extrude(base: List<Vertex>, offsetsAndScales: List<Pair<Float, Float>>): Mesh {
+/** Note that if base is the bottom (facing away from the camera) and the offsets are positive,
+ * Then the base should be anti-clockwise.
+ *
+ * If this doesn't make sense and it looks wrong, just try using .reverse() on the base.
+ */
+fun extrude(base: List<Vertex>, offsetsAndScales: List<Pair<Double, Double>>): Mesh {
     val verts = ArrayList<Vertex>(base.size * (offsetsAndScales.size + 1))
+    val indexes = ArrayList<Int>()
     verts.addAll(base)
+    var index = base.size
     for ((offset, scale) in offsetsAndScales) {
         for (baseVert in base) {
-            verts.add(Vertex(baseVert.x * scale, baseVert.y * scale, offset.toDouble()))
+            verts.add(Vertex(baseVert.x * scale, baseVert.y * scale, offset))
+
+            var nextIndex = index + 1
+            if ((nextIndex % base.size) == 0) {
+                nextIndex -= base.size
+            }
+
+            indexes.addAll(listOf(
+                    index,
+                    nextIndex,
+                    index - base.size,
+                    index - base.size,
+                    nextIndex,
+                    nextIndex - base.size
+            ))
+
+            index += 1
         }
     }
 
-    val indexes = ArrayList<Int>()
-
-    // TODO: Build the side rects.
-    // TODO: Run dogEar on the top and bottom to complete making the Mesh.
-    // TODO: Rewrite Bolt and then write all the others using this.
-    //       Although... no matter what I think of, snowflake will suck to do...
-    // TODO: Test once it's done...
+    val baseEars = earClip(base)
+    val baseToTopOffset = base.size * offsetsAndScales.size
+    indexes.addAll(baseEars)
+    indexes.addAll(baseEars.reversed().map { it + baseToTopOffset })
     return Mesh(verts, indexes)
 }
 
@@ -61,7 +134,9 @@ data class Mesh(val vertexes: List<Vertex>, val indices: List<Int>) {
     companion object {
         val named = mutableMapOf(
                 "bolt" to bolt,
-                "star" to star5
+                "star" to star5,
+                "drop" to drop,
+                "rupee" to rupee
         )
     }
 
@@ -87,42 +162,28 @@ fun star(points: Int, innerRadius: Double, outerRadius: Double, centerThickness:
 }
 
 val star5 = star(5, 0.25, 0.5, 0.25)
-val bolt = Mesh(
-        listOf(
-                // Top cap:
-                Vertex(-0.2,  0.5,  0.2),
-                Vertex( 0.2,  0.5,  0.2),
-                Vertex( 0.2,  0.5, -0.2),
-                Vertex(-0.2,  0.5, -0.2),
-                // Right side:
-                Vertex( 0.0, -0.3,  0.2),
-                Vertex( 0.0, -0.3, -0.2),
-                Vertex( 0.2,  0.3,  0.2),
-                Vertex( 0.2,  0.3, -0.2),
-                // Bottom point:
-                Vertex( 0.0, -0.5,  0.2),
-                Vertex( 0.0, -0.5, -0.2),
-                // Left side:
-                Vertex( 0.0,  0.3,  0.2),
-                Vertex( 0.0,  0.3, -0.2),
-                Vertex(-0.3, -0.3,  0.2),
-                Vertex(-0.3, -0.3, -0.2)),
-        rects(0, 1, 2, 3, // Top cap
-                // Right side:
-                1, 4, 5, 2,
-                4, 6, 7, 5,
-                6, 8, 9, 7,
-                // Left side:
-                8, 10, 11, 9,
-                10, 12, 13, 11,
-                12, 0, 3, 13,
-                // Front rects:
-                0, 1, 4, 12,
-                12, 4, 6, 10,
-                // Back rects:
-                2, 3, 13, 5,
-                5, 13, 7, 11
-                ) + listOf(
-                6, 10, 8, // Front triangle
-                7, 11, 9) // Back triangle
-        )
+val bolt = extrude(listOf(
+        Vertex(-0.25, 0.5, -0.2),
+        Vertex(-0.5,  0.0, -0.2),
+        Vertex( 0.1, -0.1, -0.2),
+        Vertex( 0.0, -0.5, -0.2),
+        Vertex( 0.5,  0.1, -0.2),
+        Vertex( 0.0,  0.2, -0.2),
+        Vertex( 0.25, 0.5, -0.2)),
+        listOf(Pair(0.4, 1.0)))
+val drop = extrude(listOf(
+        Vertex( 0.0,  0.5, -0.2),
+        Vertex(-0.5, -0.3, -0.2),
+        Vertex(-0.3, -0.4, -0.2),
+        Vertex( 0.0, -0.5, -0.2),
+        Vertex(0.3, -0.4, -0.2),
+        Vertex(0.5, -0.3, -0.2)),
+        listOf(Pair(0.2, 1.2), Pair(0.4, 1.0)))
+val rupee = extrude(listOf(
+        Vertex(0.0, 0.4, -0.2),
+        Vertex(-0.2, 0.2, -0.2),
+        Vertex(-0.2, -0.2, -0.2),
+        Vertex(0.0, -0.4, -0.2),
+        Vertex(0.2, -0.2, -0.2),
+        Vertex(0.2, 0.2, -0.2)),
+        listOf(Pair(0.2, 1.25), Pair(0.4, 1.0)))
