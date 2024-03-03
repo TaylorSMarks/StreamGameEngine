@@ -136,7 +136,8 @@ data class Mesh(val vertexes: List<Vertex>, val indices: List<Int>) {
                 "bolt" to bolt,
                 "star" to star5,
                 "drop" to drop,
-                "rupee" to rupee
+                "rupee" to rupee,
+                "heart" to heart
         )
     }
 
@@ -187,3 +188,11 @@ val rupee = extrude(listOf(
         Vertex(0.2, -0.2, -0.2),
         Vertex(0.2, 0.2, -0.2)),
         listOf(Pair(0.2, 1.25), Pair(0.4, 1.0)))
+val heart = extrude(listOf(
+        Vertex(0.0, 0.30, -0.2),
+        Vertex(-0.22, 0.40, -0.2),
+        Vertex(-0.45, 0.25, -0.2),
+        Vertex(0.0, -0.40, -0.2),
+        Vertex(0.45, 0.25, -0.2),
+        Vertex(0.22, 0.40, -0.2)),
+        listOf(Pair(0.2, 1.1), Pair(0.4, 1.0)))

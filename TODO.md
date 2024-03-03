@@ -5,7 +5,6 @@
 5. Refactor all of the UI code relating to visibility, both on the Kotlin and Javascript side
 6. Flash the countdown as it nears the end.
 7. Meshes, not just spheres
-    * Heart (Red)
     * Crescent Moon (Purple)
     * Snowflake (White)
 8. Improve meshes:

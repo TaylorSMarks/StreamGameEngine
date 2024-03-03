@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 val colorMeshPairs = listOf(
-        Pair("#ff0000", "sphere"),  // TODO: Heart
+        Pair("#ff0000", "heart"),
         Pair("#ff8800", "bolt"),
         Pair("#ffff00", "star"),
         Pair("#00ff00", "rupee"),
