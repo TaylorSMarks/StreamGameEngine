@@ -137,7 +137,8 @@ data class Mesh(val vertexes: List<Vertex>, val indices: List<Int>) {
                 "star" to star5,
                 "drop" to drop,
                 "rupee" to rupee,
-                "heart" to heart
+                "heart" to heart,
+                "crescent" to crescent
         )
     }
 
@@ -198,3 +199,21 @@ val heart = extrude(listOf(
         Vertex(0.45, 0.25, -0.2),
         Vertex(0.22, 0.40, -0.2)),
         listOf(Pair(0.2, 1.1), Pair(0.4, 1.0)))
+val crescent = extrude(listOf(
+        // It'll be 16 points... the most so far, and maybe the most of all? We'll see what the snowflake ends up being like...
+        // The outer circle will consist of the values 0.4, 0.35, 0.2, and 0.0, while the inner will be 0.32, 0.28, 0.16, and 0.0...
+        Vertex(0.0, 0.40, -0.2),
+        Vertex(-0.2, 0.35, -0.2),  // Top transition point.
+        Vertex(-0.04, 0.28, -0.2),
+        Vertex(0.08, 0.16, -0.2),
+        Vertex(0.12, 0.0, -0.2),
+        Vertex(0.08, -0.16, -0.2),
+        Vertex(-0.04, -0.28, -0.2),
+        Vertex(-0.2, -0.35, -0.2),  // Bottom transition point.
+        Vertex(0.0, -0.40, -0.2),
+        Vertex(0.2, -0.35, -0.2),
+        Vertex(0.35, -0.20, -0.2),
+        Vertex(0.4, 0.0, -0.2),
+        Vertex(0.35, 0.2, -0.2),
+        Vertex(0.2, 0.35, -0.2)),
+        listOf(Pair(0.2, 1.25), Pair(0.4, 1.0)))

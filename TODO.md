@@ -5,9 +5,7 @@
 5. Start a glow on any tile as its selected, as visual confirmation that the selection registered.
 6. Refactor all of the UI code relating to visibility, both on the Kotlin and Javascript side
 7. Flash the countdown as it nears the end. Maybe flash the background when a life is lost?
-8. Meshes, not just spheres
-    * Crescent Moon (Purple)
-    * Snowflake (White)
+8. Make a snowflake mesh.
 9. Fill in the far left and right edges of an iPhone in landscape.
 10. Also fix the damn issue where it keeps crashing based on the SSE Event streams being resized or whatever.
 11. Include a hash for meshes. Cache meshes in local storage on the javascript side.

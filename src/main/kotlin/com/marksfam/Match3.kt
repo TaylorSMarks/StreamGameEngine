@@ -17,7 +17,7 @@ val colorMeshPairs = listOf(
         Pair("#ffff00", "star"),
         Pair("#00ff00", "rupee"),
         Pair("#4444ff", "drop"),
-        Pair("#bb00bb", "sphere"),  // TODO: Crescent
+        Pair("#bb00bb", "crescent"),
         Pair("#ffffff", "sphere"))  // TODO: Snowflake
 
 @RestController
