@@ -173,13 +173,15 @@ val bolt = extrude(listOf(
         Vertex( 0.25, 0.5, -0.2)),
         listOf(Pair(0.4, 1.0)))
 val drop = extrude(listOf(
-        Vertex( 0.0,  0.5, -0.2),
-        Vertex(-0.5, -0.3, -0.2),
-        Vertex(-0.3, -0.4, -0.2),
-        Vertex( 0.0, -0.5, -0.2),
-        Vertex(0.3, -0.4, -0.2),
-        Vertex(0.5, -0.3, -0.2)),
-        listOf(Pair(0.2, 1.2), Pair(0.4, 1.0)))
+        Vertex(0.0, 0.4, -0.2),
+        Vertex(-0.25, -0.15, -0.2),
+        Vertex(-0.22, -0.28, -0.2),
+        Vertex(-0.12, -0.37, -0.2),
+        Vertex(0.0, -0.4, -0.2),
+        Vertex(0.12, -0.37, -0.2),
+        Vertex(0.22, -0.28, -0.2),
+        Vertex(0.25, -0.15, -0.2)),
+        listOf(Pair(0.2, 1.25), Pair(0.4, 1.0)))
 val rupee = extrude(listOf(
         Vertex(0.0, 0.4, -0.2),
         Vertex(-0.2, 0.2, -0.2),
