@@ -1,8 +1,11 @@
 package com.marksfam.engine
 
 import java.lang.Math.TAU
+import kotlin.math.acos
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class Vertex(val x: Double, val y: Double, val z: Double)
 
@@ -160,6 +163,38 @@ fun star(points: Int, innerRadius: Double, outerRadius: Double, centerThickness:
 
     val topIndexes = (2 ..< ((points + 1) * 2)).toList()
     val indexes = cap(0, topIndexes) + cap(1, topIndexes.asReversed())
+    return Mesh(vertexes, indexes)
+}
+
+fun snowflake(arm: List<Vertex>, arms: Int, thickness: Double): Mesh {
+    // TODO: Create a snowflake mesh using this function.
+
+    // It takes in a set of vertices (arm) that begins at (0, 0) and ends on X = 0 again.
+    // It'll mirror over X = 0.
+    // Then it'll extrude by thickness.
+    // Then it'll repeat arms times. And that's the whole mesh.
+    val base = ArrayList<Vertex>()
+    base.addAll(arm)
+    base.addAll(arm.subList(1, arm.size - 1).map { Vertex(-it.x, it.y, it.z) })
+    val partialMesh = extrude(base, listOf(Pair(thickness, 1.0)))
+    val indexes = ArrayList<Int>(partialMesh.indices.size * arms)
+
+    for (i in 0..<arms) {
+        val offset = i * partialMesh.indices.size
+        indexes.addAll(partialMesh.indices.map { it + offset })
+    }
+
+    val vertexes = ArrayList<Vertex>(partialMesh.vertexes.size * arms)
+
+    for (i in 0..<arms) {
+        val rotation = i * (TAU / arms)
+        vertexes.addAll(partialMesh.vertexes.map {
+            val angle = acos(it.x / it.y) + rotation
+            val distance = sqrt(it.x.pow(2) + it.y.pow(2))
+            Vertex(cos(angle) * distance, sin(angle) * distance, it.z)
+        })
+    }
+
     return Mesh(vertexes, indexes)
 }
 
